@@ -1,0 +1,38 @@
+spring:
+    profiles: dev
+servicenowConfiguration:
+    instanceUrl: jdbc:mysql://localhost:3306/carry4u_cnleng_dev
+    username: admin
+    password: root
+ecsConfiguration:
+    ecsMgmtAccessKey: AIzaSyAWNS39cnGHhvrzyJqTzjsoa_QUuL4frd4
+    ecsMgmtSecretKey: 491126193419-8nefef40b8osi6spv7omhdg8airt8icn.apps.googleusercontent.com
+    ecsMgmtPort: 4443
+    hosts:
+      - 10.1.81.51
+
+      - 10.1.83.52
+      
+      - 10.1.83.53
+      
+      - 10.1.83.54
+
+---
+spring:
+    profiles: prod
+servicenowConfiguration:
+    instanceUrl: jdbc:mysql://localhost:3306/carry4u_cnleng_dev
+    username: admin
+    password: root
+ecsConfiguration:
+    ecsMgmtAccessKey: AIzaSyAWNS39cnGHhvrzyJqTzjsoa_QUuL4frd4
+    ecsMgmtSecretKey: 491126193419-8nefef40b8osi6spv7omhdg8airt8icn.apps.googleusercontent.com
+    ecsMgmtPort: 4443
+    hosts:
+      - 10.1.81.51
+
+      - 10.1.83.52
+      
+      - 10.1.83.53
+      
+      - 10.1.83.54

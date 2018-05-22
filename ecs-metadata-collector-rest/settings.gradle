@@ -1,0 +1,16 @@
+rootProject.name = 'ecs-metadata-collector-rest'
+
+include 'ecs-mgmt-client'
+project(":ecs-mgmt-client").projectDir = file("../ecs-mgmt-client")
+
+include 'ecs-metadata-dao'
+project(":ecs-metadata-dao").projectDir = file("../ecs-metadata-dao")
+
+include 'ecs-metadata-stdout-dao'
+project(":ecs-metadata-stdout-dao").projectDir = file("../ecs-metadata-stdout-dao")
+
+include 'ecs-metadata-elasticsearch-dao'
+project(":ecs-metadata-elasticsearch-dao").projectDir = file("../ecs-metadata-elasticsearch-dao")
+
+include 'ecs-metadata-service-now-dao'
+project(":ecs-metadata-service-now-dao").projectDir = file("../ecs-metadata-service-now-dao")
