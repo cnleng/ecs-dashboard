@@ -73,7 +73,7 @@ public class NamespaceBO {
 	 * 
 	 * @return List - List of namespace details
 	 */
-	public void collectNamespaceDetails(Date collectionTime) {
+	public List<NamespaceDetail> collectNamespaceDetails(Date collectionTime) {
 
 		// Start collecting namespace data details from ECS systems
 		List<Namespace> namespaceList = getNamespaces();
@@ -96,9 +96,10 @@ public class NamespaceBO {
 				namespaceDAO.insert(namespaceDetail, collectionTime);
 			}
 		}
-
+		
 		// peg global counter
 		this.objectCount.getAndAdd(objCounter);
+		return namespaceDetails;
 	}
 	
 	/**
@@ -106,12 +107,10 @@ public class NamespaceBO {
 	 * 
 	 * @return List - List of namespace quota
 	 */
-	public void collectNamespaceQuota(Date collectionTime) {
+	public List<NamespaceQuota> collectNamespaceQuota(Date collectionTime) {
 
 		// Start collecting namespace data quota from ECS systems
 		List<Namespace> namespaceList = getNamespaces();
-		// At this point we should have all the namespace supported by the ECS
-		// system
 		List<NamespaceQuota> namespaceQuotas = new ArrayList<>();
 		long objCounter = 0;
 
@@ -119,19 +118,17 @@ public class NamespaceBO {
 			
 			NamespaceRequest namespaceRequest = new NamespaceRequest();
 			namespaceRequest.setName(namespace.getName());
-
 			LOGGER.info("Collecting Quota Details for namespace: " + namespace.getName());
 			NamespaceQuota namespaceQuota = client.getNamespaceQuota(namespaceRequest);
 
 			if (namespaceQuota == null) {
 				continue;
 			}
-
 			objCounter++;
 
 			// Push collected details into datastore
-			namespaceQuotas.add(namespaceQuota);
 			if (namespaceDAO != null) {
+				namespaceQuotas.add(namespaceQuota);
 				// insert something
 				namespaceDAO.insert(namespaceQuota, collectionTime);
 			}
@@ -140,6 +137,7 @@ public class NamespaceBO {
 
 		// peg global counter
 		this.objectCount.getAndAdd(objCounter);
+		return namespaceQuotas;
 	}
 
 	public void shutdown() {

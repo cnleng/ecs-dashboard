@@ -1,17 +1,20 @@
 /**
  * 
  */
-package com.emc.eccs.metadata.configuration;
+package com.emc.ecs.metadata.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.emc.ecs.metadata.dao.servicenow.ServiceNowDAOConfig;
 
 /**
  * @author nlengc
  *
  */
 @Configuration
-@ConfigurationProperties(prefix = "servicenowConfiguration")
+@ConfigurationProperties(prefix = "serviceNowConfiguration")
 public class ServiceNowConfiguration {
 
 	private String instanceUrl;
@@ -57,8 +60,17 @@ public class ServiceNowConfiguration {
 	public final void setPassword(String password) {
 		this.password = password;
 	}
-
-	//@Bean
+	
+//	@Bean
+//	public ServiceNowConfiguration serviceNowConfiguration() {
+//		ServiceNowConfiguration configuration = new ServiceNowConfiguration();
+//		configuration.setInstanceUrl(this.getInstanceUrl());
+//		configuration.setPassword(this.getPassword());
+//		configuration.setUsername(this.getUsername());
+//		return configuration;
+//	}
+//
+//	@Bean
 //	public ServiceNowDAOConfig serviceNowDAOConfig() throws Exception {
 //		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 //		serviceNowDAOConfig.setInstanceUrl(this.getInstanceUrl());

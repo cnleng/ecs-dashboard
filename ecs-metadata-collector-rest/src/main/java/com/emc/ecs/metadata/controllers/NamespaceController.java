@@ -3,7 +3,7 @@
  */
 package com.emc.ecs.metadata.controllers;
 
-import java.util.Date;
+import java.text.ParseException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -34,9 +34,9 @@ public class NamespaceController {
 	private NamespaceService namespaceService;
 	
 	@RequestMapping(value = NAMESPACE_DETAILS, method = RequestMethod.GET)
-	List<NamespaceDetail> getNamespaceDetails(@RequestParam("collectionTime") String collectionTime) {
-		
-		return null;
+	public List<NamespaceDetail> getNamespaceDetails(@RequestParam(value="collectionTime", required=false) String collectionTime) throws ParseException {
+//		return Arrays.asList(Constants.getDummyNamespaceDetail());
+		return namespaceService.getNamespaceDetails(Constants.DATA_DATE_FORMAT.parse(collectionTime));
 	}
 	
 	/**
@@ -45,8 +45,8 @@ public class NamespaceController {
 	 * @return
 	 */
 	@RequestMapping(value = NAMESPACE_QUOTAS, method = RequestMethod.GET)
-	List<NamespaceQuota> getNamespaceQuotas(@RequestParam("collectionTime") String collectionTime) {
-		return null;
+	List<NamespaceQuota> getNamespaceQuotas(@RequestParam(value="collectionTime", required=false) String collectionTime) throws ParseException {
+		return namespaceService.getNamespaceQuotas(Constants.DATA_DATE_FORMAT.parse(collectionTime));
 	}
 	
 }

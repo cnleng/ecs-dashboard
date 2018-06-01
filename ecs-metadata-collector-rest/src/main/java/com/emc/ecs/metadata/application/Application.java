@@ -10,16 +10,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * @author nlengc
  *
  */
 @SpringBootApplication
-@EnableAsync
-@EnableScheduling
+//@EnableAsync
+//@EnableScheduling
 @ComponentScan(basePackages = { "com.emc.ecs.metadata.*" })
 public class Application {
 	private static final Logger LOG = Logger.getLogger(Application.class);

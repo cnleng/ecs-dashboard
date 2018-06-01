@@ -10,3 +10,6 @@ project(":ecs-metadata-stdout-dao").projectDir = file("../ecs-metadata-stdout-da
 
 include 'ecs-metadata-elasticsearch-dao'
 project(":ecs-metadata-elasticsearch-dao").projectDir = file("../ecs-metadata-elasticsearch-dao")
+
+include 'ecs-metadata-service-now-dao'
+project(":ecs-metadata-service-now-dao").projectDir = file("../ecs-metadata-service-now-dao")

@@ -1,11 +1,11 @@
 /**
  * 
  */
-package com.emc.eccs.metadata.configuration;
+package com.emc.ecs.metadata.configuration;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,19 +15,20 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConfigurationProperties(prefix = "ecsConfiguration")
-public class ECSConfiguration {
+public class EcsConfiguration {
 	
 	private static final Integer DEFAULT_ECS_MGMT_PORT = 4443;
 	
 	private String ecsMgmtAccessKey;
 	private String ecsMgmtSecretKey;
 	private Integer ecsMgmtPort;
-	private List<String> ecsHosts = new ArrayList<>();
+	@Value("#{'${ecsConfiguration.hosts}'.split(',')}")
+	private List<String> ecsHosts;
 
 	/**
 	 * 
 	 */
-	public ECSConfiguration() {
+	public EcsConfiguration() {
 	}
 
 	public final List<String> getEcsHosts() {
@@ -55,7 +56,7 @@ public class ECSConfiguration {
 	}
 
 	public final Integer getEcsMgmtPort() {
-		return ecsMgmtPort;
+		return (ecsMgmtPort != null) ? ecsMgmtPort : DEFAULT_ECS_MGMT_PORT;
 	}
 
 	public final void setEcsMgmtPort(Integer ecsMgmtPort) {
@@ -65,5 +66,15 @@ public class ECSConfiguration {
 	public static final Integer getDefaultEcsMgmtPort() {
 		return DEFAULT_ECS_MGMT_PORT;
 	}
+	
+//	@Bean
+//	public ECSConfiguration ecsConfiguration() {
+//		ECSConfiguration configuration = new ECSConfiguration();
+//		configuration.setEcsHosts(this.getEcsHosts());
+//		configuration.setEcsMgmtAccessKey(this.getEcsMgmtAccessKey());
+//		configuration.setEcsMgmtSecretKey(this.getEcsMgmtSecretKey());
+//		configuration.setEcsMgmtPort(getEcsMgmtPort());
+//		return configuration;
+//	}
 
 }

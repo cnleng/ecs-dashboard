@@ -28,5 +28,5 @@ public interface NamespaceService {
 	 * @return
 	 */
 	List<NamespaceQuota> getNamespaceQuotas(Date collectionTime);
-	
+
 }

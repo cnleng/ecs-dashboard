@@ -10,10 +10,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.emc.eccs.metadata.configuration.ECSConfiguration;
-import com.emc.eccs.metadata.configuration.ServiceNowConfiguration;
 import com.emc.ecs.management.entity.NamespaceDetail;
 import com.emc.ecs.management.entity.NamespaceQuota;
+import com.emc.ecs.metadata.configuration.EcsConfiguration;
+import com.emc.ecs.metadata.configuration.ServiceNowConfiguration;
 import com.emc.ecs.metadata.dao.NamespaceDAO;
 import com.emc.ecs.metadata.dao.servicenow.ServiceNowDAOConfig;
 import com.emc.ecs.metadata.dao.servicenow.ServiceNowNamespaceDAO;
@@ -29,35 +29,50 @@ public class NamespaceServiceImpl implements NamespaceService {
 
 	private static AtomicLong objectCount = new AtomicLong(0L);
 	@Autowired
-	private ServiceNowConfiguration servicenowConfiguration;
+	private ServiceNowConfiguration serviceNowConfiguration;
 	@Autowired
-	private ECSConfiguration ecsConfiguration;
+	private EcsConfiguration ecsConfiguration;
 
 	@Override
 	public List<NamespaceDetail> getNamespaceDetails(Date collectionTime) {
 		NamespaceDAO namespaceDAO = null;
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
-		serviceNowDAOConfig.setInstanceUrl(servicenowConfiguration.getInstanceUrl());
-		serviceNowDAOConfig.setUsername(servicenowConfiguration.getUsername());
-		serviceNowDAOConfig.setPassword(servicenowConfiguration.getPassword());
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
+		serviceNowDAOConfig.setCollectionTime(collectionTime);
+		namespaceDAO = new ServiceNowNamespaceDAO(serviceNowDAOConfig);
+
+		// instantiate namespace BO
+		NamespaceBO namespaceBO = new NamespaceBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO, objectCount);
+
+		// Start collection
+		List<NamespaceDetail> namespaceDetails = namespaceBO.collectNamespaceDetails(collectionTime);
+		namespaceBO.shutdown();
+		return namespaceDetails;
+	}
+
+	@Override
+	public List<NamespaceQuota> getNamespaceQuotas(Date collectionTime) {
+		NamespaceDAO namespaceDAO = null;
+		// Instantiate ServiceNow
+		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
 		namespaceDAO = new ServiceNowNamespaceDAO(serviceNowDAOConfig);
 
 		// instantiate billing BO
 		NamespaceBO namespaceBO = new NamespaceBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
 				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO, objectCount);
-//
-//		// Start collection
-		namespaceBO.collectNamespaceDetails(collectionTime);
-		namespaceBO.shutdown();
-		return null;
-	}
 
-	@Override
-	public List<NamespaceQuota> getNamespaceQuotas(Date collectionTime) {
-		// TODO Auto-generated method stub
-		return null;
+		// Start collection
+		List<NamespaceQuota> namespaceQuotas = namespaceBO.collectNamespaceQuota(collectionTime);
+		namespaceBO.shutdown();
+		return namespaceQuotas;
 	}
 
 }
