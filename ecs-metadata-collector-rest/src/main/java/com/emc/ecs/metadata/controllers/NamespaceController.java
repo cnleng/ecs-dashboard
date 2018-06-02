@@ -35,7 +35,6 @@ public class NamespaceController {
 	
 	@RequestMapping(value = NAMESPACE_DETAILS, method = RequestMethod.GET)
 	public List<NamespaceDetail> getNamespaceDetails(@RequestParam(value="collectionTime", required=false) String collectionTime) throws ParseException {
-//		return Arrays.asList(Constants.getDummyNamespaceDetail());
 		return namespaceService.getNamespaceDetails(Constants.DATA_DATE_FORMAT.parse(collectionTime));
 	}
 	
