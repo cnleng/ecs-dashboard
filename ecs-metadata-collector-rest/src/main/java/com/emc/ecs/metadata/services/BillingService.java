@@ -28,4 +28,16 @@ public interface BillingService {
 	 * @return
 	 */
 	List<ObjectBuckets> getObjectBuckets(Date collectionTime);
+
+	/**
+	 * 
+	 * @param parse
+	 */
+	void postNamespaceBillingInfo(Date parse);
+
+	/**
+	 * 
+	 * @param parse
+	 */
+	void postObjectBuckets(Date parse);
 }

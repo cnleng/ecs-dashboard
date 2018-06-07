@@ -29,4 +29,16 @@ public interface NamespaceService {
 	 */
 	List<NamespaceQuota> getNamespaceQuotas(Date collectionTime);
 
+	/**
+	 * 
+	 * @param collectionTime
+	 */
+	void postNamespaceDetails(Date collectionTime);
+
+	/**
+	 * 
+	 * @param collectionTime
+	 */
+	void postNamespaceQuotas(Date collectionTime);
+
 }

@@ -75,4 +75,44 @@ public class NamespaceServiceImpl implements NamespaceService {
 		return namespaceQuotas;
 	}
 
+	@Override
+	public void postNamespaceDetails(Date collectionTime) {
+		NamespaceDAO namespaceDAO = null;
+		// Instantiate ServiceNow
+		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
+		serviceNowDAOConfig.setCollectionTime(collectionTime);
+		namespaceDAO = new ServiceNowNamespaceDAO(serviceNowDAOConfig);
+
+		// instantiate namespace BO
+		NamespaceBO namespaceBO = new NamespaceBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO, objectCount);
+
+		// Start collection
+		namespaceBO.collectNamespaceDetails(collectionTime);
+		namespaceBO.shutdown();		
+	}
+
+	@Override
+	public void postNamespaceQuotas(Date collectionTime) {
+		NamespaceDAO namespaceDAO = null;
+		// Instantiate ServiceNow
+		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
+		serviceNowDAOConfig.setCollectionTime(collectionTime);
+		namespaceDAO = new ServiceNowNamespaceDAO(serviceNowDAOConfig);
+
+		// instantiate billing BO
+		NamespaceBO namespaceBO = new NamespaceBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO, objectCount);
+
+		// Start collection
+		namespaceBO.collectNamespaceQuota(collectionTime);
+		namespaceBO.shutdown();
+	}
+
 }

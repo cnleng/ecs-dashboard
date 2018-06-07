@@ -28,4 +28,16 @@ public interface VdcService {
 	 * @return
 	 */
 	List<VdcDetails> getVdcDetails(Date collectionTime);
+
+	/**
+	 * 
+	 * @param collectionTime
+	 */
+	void postVdcDetails(Date collectionTime);
+
+	/**
+	 * 
+	 * @param collectionTime
+	 */
+	void postBucketOwners(Date collectionTime);
 }

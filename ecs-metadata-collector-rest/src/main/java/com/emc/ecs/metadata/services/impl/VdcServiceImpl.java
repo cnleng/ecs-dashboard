@@ -81,4 +81,44 @@ public class VdcServiceImpl implements VdcService {
 		return vdcDetails;
 	}
 
+	@Override
+	public void postVdcDetails(Date collectionTime) {
+		VdcDAO vdcDAO = null;
+		// Instantiate ServiceNow
+		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
+		serviceNowDAOConfig.setCollectionTime(collectionTime);
+		vdcDAO = new ServiceNowVdcDAO(serviceNowDAOConfig);
+
+		// instantiate BO
+		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), vdcDAO, objectCount);
+
+		// Start collection
+		vdcBO.collectVdcDetails(collectionTime); 
+		vdcBO.shutdown();
+	}
+
+	@Override
+	public void postBucketOwners(Date collectionTime) {
+		VdcDAO vdcDAO = null;
+		// Instantiate ServiceNow
+		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
+		serviceNowDAOConfig.setCollectionTime(collectionTime);
+		vdcDAO = new ServiceNowVdcDAO(serviceNowDAOConfig);
+
+		// instantiate BO
+		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), vdcDAO, objectCount);
+
+		// Start collection
+		vdcBO.collectBucketOwner(collectionTime); 
+		vdcBO.shutdown();
+	}
+
 }

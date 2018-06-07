@@ -57,7 +57,7 @@ public class NamespaceBillingInfo {
 	private String 					namespace;
 	private String					sampleTime;
 	
-	 @XmlElement(name = BUCKET_BILLING_INFO_TAG)
+	@XmlElement(name = BUCKET_BILLING_INFO_TAG)
 	public List<BucketBillingInfo> getBucketBillingInfo() {
 		return bucketBillingInfo;
 	}

@@ -89,4 +89,44 @@ public class BillingServiceImpl implements BillingService {
 		return objectBuckets;
 	}
 
+	@Override
+	public void postNamespaceBillingInfo(Date collectionTime) {
+		BillingDAO billingDAO = null;
+		// Instantiate ServiceNow
+		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
+		serviceNowDAOConfig.setCollectionTime(collectionTime);
+		billingDAO = new ServiceNowBillingDAO(serviceNowDAOConfig);
+
+		// instantiate billing BO
+		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
+
+		// Start collection
+		billingBO.collectBillingData(collectionTime); 
+		billingBO.shutdown();
+	}
+
+	@Override
+	public void postObjectBuckets(Date collectionTime) {
+		BillingDAO billingDAO = null;
+		// Instantiate ServiceNow
+		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
+		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
+		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
+		serviceNowDAOConfig.setCollectionTime(collectionTime);
+		billingDAO = new ServiceNowBillingDAO(serviceNowDAOConfig);
+
+		// instantiate billing BO
+		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
+
+		// Start collection
+		billingBO.collectObjectBuckets(collectionTime);
+		billingBO.shutdown();
+	}
+
 }
