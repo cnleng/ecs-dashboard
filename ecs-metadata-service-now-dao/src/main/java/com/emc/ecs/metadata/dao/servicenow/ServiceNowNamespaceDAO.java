@@ -4,6 +4,8 @@
 package com.emc.ecs.metadata.dao.servicenow;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -40,9 +42,8 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	 */
 	@Override
 	public void insert(NamespaceDetail namespaceDetail, Date collectionTime) {
-		final ObjectMapper mapper = new ObjectMapper();
 		try {
-			final String json = mapper.writeValueAsString(namespaceDetail);
+			final String json = this.convertDetailsObjectToJson(namespaceDetail);
 			this.postData(this.url + ECS_NAMESPACE_DETAILS, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for namespace details ",e);
@@ -54,9 +55,8 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	 */
 	@Override
 	public void insert(NamespaceQuota namespacequota, Date collectionTime) {
-		final ObjectMapper mapper = new ObjectMapper();
 		try {
-			final String json = mapper.writeValueAsString(namespacequota);
+			final String json = this.convertQuotaObjectToJson(namespacequota);
 			this.postData(this.url + ECS_NAMESPACE_QUOTA, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for namespace quota ",e);
@@ -70,5 +70,49 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	public Long purgeOldData(NamespaceDataType type, Date thresholdDate) {
 		return null;
 	}
+	
+	/**
+	 * 
+	 * @param quota
+	 * @return
+	 * @throws JsonProcessingException
+	 */
+	private String convertQuotaObjectToJson(NamespaceQuota quota) throws JsonProcessingException {
+		final ObjectMapper mapper = new ObjectMapper();
+		final Map<String, Object> jsonMap = new HashMap<>();
+		jsonMap.put("namespace", quota.getNamespace());
+		jsonMap.put("blocksize", quota.getBlockSize());
+		jsonMap.put("notificationsize", quota.getNotificationSize());
+		return mapper.writeValueAsString(jsonMap);
+	}
 
+	/**
+	 * 
+	 * @param namespaceDetail
+	 * @return
+	 * @throws JsonProcessingException
+	 */
+	private String convertDetailsObjectToJson(NamespaceDetail namespaceDetail) throws JsonProcessingException {
+		final ObjectMapper mapper = new ObjectMapper();
+		final Map<String, Object> jsonMap = new HashMap<>();
+		jsonMap.put("id", namespaceDetail.getId());
+		jsonMap.put("link", namespaceDetail.getLink());
+		jsonMap.put("namespaceadmins", namespaceDetail.getNamespaceAdmins());
+		jsonMap.put("defaultdataservicesvpool", namespaceDetail.getDefaultDataServicesVPool());
+		jsonMap.put("allowedvpools", namespaceDetail.getAllowedVPools());
+		jsonMap.put("disallowedVPools", namespaceDetail.getDisallowedVPools());
+		jsonMap.put("isencryptionenabled", namespaceDetail.getIsEncryptionEnabled());
+		jsonMap.put("isstaledallowed", namespaceDetail.getIsStaledAllowed());
+		jsonMap.put("iscomplianceenabled", namespaceDetail.getIsComplianceEnabled());
+		jsonMap.put("global", namespaceDetail.getGlobal());
+		jsonMap.put("inactive", namespaceDetail.getInactive());
+		jsonMap.put("remote", namespaceDetail.getRemote());
+		jsonMap.put("internal", namespaceDetail.getInternal());
+		jsonMap.put("vdc", namespaceDetail.getVdc());
+		jsonMap.put("userMappings", namespaceDetail.getUserMappings());
+		jsonMap.put("creationtime", namespaceDetail.getCreationTime());
+		jsonMap.put("defaultbucketblocksize", namespaceDetail.getDefaultBucketBlockSize());
+		jsonMap.put("externalgroupadmins", namespaceDetail.getExternalGroupAdmins());
+		return mapper.writeValueAsString(jsonMap);
+	}
 }
