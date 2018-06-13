@@ -5,20 +5,20 @@ serviceNowConfiguration:
     username: admin
     password: admin
 ecsConfiguration:
-    ecsMgmtAccessKey: AIzaSyAWNS39cnGHhvrzyJqTzjsoa_QUuL4frd4
-    ecsMgmtSecretKey: 491126193419-8nefef40b8osi6spv7omhdg8airt8icn.apps.googleusercontent.com
-    ecsMgmtPort: 4443
-    hosts: 192.168.0.100
+    ecsMgmtAccessKey: TOIDSFSkhau7EcLtHKAn
+    ecsMgmtSecretKey: ChangeMeChangeMeChangeMeChangeMeChangeMe
+    ecsMgmtPort: 80
+    ecsHosts: 192.168.0.151
 
 ---
 spring:
-    profiles: prod
-servicenowConfiguration:
+    profiles: oil
+serviceNowConfiguration:
     instanceUrl: https://dev34384.service-now.com
     username: admin
-    password: root
+    password: admin
 ecsConfiguration:
-    ecsMgmtAccessKey: AIzaSyAWNS39cnGHhvrzyJqTzjsoa_QUuL4frd4
-    ecsMgmtSecretKey: 491126193419-8nefef40b8osi6spv7omhdg8airt8icn.apps.googleusercontent.com
+    ecsMgmtAccessKey: eric-caron-admin
+    ecsMgmtSecretKey: Nord99sud
     ecsMgmtPort: 4443
-    hosts: 192.168.0.100
+    ecsHosts: 10.1.83.51
