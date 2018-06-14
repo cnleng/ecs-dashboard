@@ -28,6 +28,7 @@ public class Constants {
 	public static final String URL_BILLING = "/billings";
 	public static final String URL_OBJECT = "/objects";
 	public static final String URL_VDC = "/vdc";
+	public static final String PARAM_RELATIVE_DAY_SHIFT = "/relativeDayShift";
 
 	public static final String DATA_DATE_PATTERN = "yyyy-MM-dd";
 	public static final SimpleDateFormat DATA_DATE_FORMAT = new SimpleDateFormat(DATA_DATE_PATTERN);

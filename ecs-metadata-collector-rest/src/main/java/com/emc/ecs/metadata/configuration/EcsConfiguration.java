@@ -6,7 +6,6 @@ package com.emc.ecs.metadata.configuration;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,6 +22,7 @@ public class EcsConfiguration {
 	private String ecsMgmtAccessKey;
 	private String ecsMgmtSecretKey;
 	private Integer ecsMgmtPort;
+	private Integer ecsAlternativePort;
 	private String ecsHosts;
 //	@Value("#{'${ecsConfiguration.hosts}'.split(',')}")
 	//private List<String> ecsHosts;
@@ -39,6 +39,14 @@ public class EcsConfiguration {
 
 	public final void setEcsHosts(String ecsHosts) {
 		this.ecsHosts = ecsHosts;
+	}
+
+	public final Integer getEcsAlternativePort() {
+		return ecsAlternativePort;
+	}
+
+	public final void setEcsAlternativePort(Integer ecsAlternativePort) {
+		this.ecsAlternativePort = ecsAlternativePort;
 	}
 
 	public final String getEcsMgmtAccessKey() {

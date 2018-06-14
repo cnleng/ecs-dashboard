@@ -10,8 +10,9 @@ import java.util.Date;
  *
  */
 public class ServiceNowDAOConfig {
-	
+
 	private String instanceUrl;
+	private String api;
 	private String username;
 	private String password;
 	private Date collectionTime;
@@ -22,6 +23,14 @@ public class ServiceNowDAOConfig {
 
 	public final void setInstanceUrl(String instanceUrl) {
 		this.instanceUrl = instanceUrl;
+	}
+
+	public final String getApi() {
+		return api;
+	}
+
+	public final void setApi(String api) {
+		this.api = api;
 	}
 
 	public final String getUsername() {

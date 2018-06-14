@@ -1,24 +1,28 @@
 spring:
     profiles: dev
 serviceNowConfiguration:
-    instanceUrl: https://dev34384.service-now.com
+    instanceUrl: https://instance.service-now.com
+    api: /api/now/table
     username: admin
     password: admin
 ecsConfiguration:
     ecsMgmtAccessKey: TOIDSFSkhau7EcLtHKAn
     ecsMgmtSecretKey: ChangeMeChangeMeChangeMeChangeMeChangeMe
     ecsMgmtPort: 80
+    ecsAlternativePort: 9101
     ecsHosts: 192.168.0.151
 
 ---
 spring:
     profiles: oil
 serviceNowConfiguration:
-    instanceUrl: https://dev34384.service-now.com
+    instanceUrl: https://instance.service-now.com
+    api: /api/now/table
     username: admin
     password: admin
 ecsConfiguration:
-    ecsMgmtAccessKey: eric-caron-admin
-    ecsMgmtSecretKey: Nord99sud
+    ecsMgmtAccessKey: accessKey
+    ecsMgmtSecretKey: secretKey
     ecsMgmtPort: 4443
+    ecsAlternativePort: 9101
     ecsHosts: 10.1.83.51

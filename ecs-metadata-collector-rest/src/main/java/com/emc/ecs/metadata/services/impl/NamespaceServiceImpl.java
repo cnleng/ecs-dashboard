@@ -39,6 +39,7 @@ public class NamespaceServiceImpl implements NamespaceService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -60,6 +61,7 @@ public class NamespaceServiceImpl implements NamespaceService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -81,6 +83,7 @@ public class NamespaceServiceImpl implements NamespaceService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -101,6 +104,7 @@ public class NamespaceServiceImpl implements NamespaceService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);

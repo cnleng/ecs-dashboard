@@ -42,6 +42,7 @@ public class VdcServiceImpl implements VdcService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -49,7 +50,7 @@ public class VdcServiceImpl implements VdcService {
 
 		// instantiate BO
 		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), vdcDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), ecsConfiguration.getEcsAlternativePort(), vdcDAO, objectCount);
 
 		// Start collection
 		List<BucketOwner> bucketOwners = vdcBO.collectBucketOwner(collectionTime); 
@@ -66,6 +67,7 @@ public class VdcServiceImpl implements VdcService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -87,6 +89,7 @@ public class VdcServiceImpl implements VdcService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -107,6 +110,7 @@ public class VdcServiceImpl implements VdcService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -114,7 +118,7 @@ public class VdcServiceImpl implements VdcService {
 
 		// instantiate BO
 		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), vdcDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), ecsConfiguration.getEcsAlternativePort(), vdcDAO, objectCount);
 
 		// Start collection
 		vdcBO.collectBucketOwner(collectionTime); 

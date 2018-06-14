@@ -31,8 +31,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -418,18 +420,19 @@ public class ManagementClient {
 		WebResource getNamespaceDetailResource = mgmtResource.path(restStr.toString());
 		String bucketKeyReponse = getNamespaceDetailResource.get(String.class);
 		final List<BucketOwner> bucketOwners = new ArrayList<>();
-		final Map<String, List<String>> urlBucketKeysmap = getUrlBucketKeyMap(bucketKeyReponse);
+		final Map<String, Set<String>> urlBucketKeysmap = getUrlBucketKeyMap(bucketKeyReponse);
 		urlBucketKeysmap.forEach((url, bucketKeys) -> {
 			final String host = url.split("@@")[0];
 			final String path = url.split("@@")[1];
-			bucketKeys.forEach( bucketKey -> {
-				WebResource getBucketDetailsResource = this.mgmtClient.resource(host)
-						.path(path)
-						.queryParam(REST_ALL_BUCKET_KEY_PARAMETER, bucketKey)
-						.queryParam(REST_ALL_BUCKET_VALUE_PARAMETER, "gpb")
-						.queryParam(REST_ALL_BUCKET_STYLE_PARAMETER, "raw");
-				bucketOwners.add(getBucketOwnerFromString(bucketKey, getBucketDetailsResource.get(String.class))); 
-			} );
+			if (bucketKeys != null && !bucketKeys.isEmpty()) {
+				bucketKeys.forEach(bucketKey -> {
+					WebResource getBucketDetailsResource = this.mgmtClient.resource(host).path(path)
+							.queryParam(REST_ALL_BUCKET_KEY_PARAMETER, bucketKey)
+							.queryParam(REST_ALL_BUCKET_VALUE_PARAMETER, "gpb")
+							.queryParam(REST_ALL_BUCKET_STYLE_PARAMETER, "raw");
+					bucketOwners.add(getBucketOwnerFromString(bucketKey, getBucketDetailsResource.get(String.class)));
+				});
+			}
 		});
 		return bucketOwners;
 	}
@@ -582,8 +585,8 @@ public class ManagementClient {
 	 * @param response
 	 * @return
 	 */
-	private Map<String, List<String>> getUrlBucketKeyMap(String response) {
-		final Map<String, List<String>> urlBucketMap = new HashMap<>();
+	private Map<String, Set<String>> getUrlBucketKeyMap(String response) {
+		final Map<String, Set<String>> urlBucketMap = new HashMap<>();
 		final String IP_PATTERN =
 				"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
 				"([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -592,17 +595,19 @@ public class ManagementClient {
 		final String HTTP_PREFIX = "http://";
 		final String EOF = "\n";
 		final String SCHEMA_TYPE = "schemaType";
+		final String BUCKET_KEY = "BUCKET_KEY/";
 		final Pattern pattern = Pattern.compile("(?s)" + HTTP_PREFIX + "\\s*(.*?)(?=\\s*" + HTTP_PREFIX + "|$)");
 		final Matcher matcher = pattern.matcher(response);
 		while (matcher.find()) {
 			List<String> arrays = Arrays.asList((HTTP_PREFIX + matcher.group(1)).split(EOF));
 			String key = "";
-			final List<String> values = new ArrayList<>();
+			final Set<String> values = new HashSet<>();
 			for(String array : arrays) {
 				if (array.startsWith(HTTP_PREFIX)) {
-					Matcher inMatcher = Pattern.compile("(?<host>"+HTTP_PREFIX + IP_PATTERN + ":(\\d+)?)(?<path>.*)").matcher(array);
+//					Matcher inMatcher = Pattern.compile("(?<host>"+HTTP_PREFIX + IP_PATTERN + ":(\\d+)?)(?<path>.*)").matcher(array);
+					Matcher inMatcher = Pattern.compile("(?<host>"+HTTP_PREFIX + IP_PATTERN + ":(\\d+)?)(?<path>.*)"+BUCKET_KEY).matcher(array);
 					while (inMatcher.find()) {
-						key = inMatcher.group("host") + "@@" +inMatcher.group("path");;
+						key = inMatcher.group("host") + "@@" + inMatcher.group("path")+BUCKET_KEY;
 					}
 				} else if (array.trim().startsWith(SCHEMA_TYPE)) {
 					String bucketId = array.trim().split("\\s+")[3];

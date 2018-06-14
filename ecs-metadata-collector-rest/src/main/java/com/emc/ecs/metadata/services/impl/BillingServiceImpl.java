@@ -46,6 +46,7 @@ public class BillingServiceImpl implements BillingService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -74,6 +75,7 @@ public class BillingServiceImpl implements BillingService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -95,6 +97,7 @@ public class BillingServiceImpl implements BillingService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
@@ -115,6 +118,7 @@ public class BillingServiceImpl implements BillingService {
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);

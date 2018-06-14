@@ -22,8 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDAO {
 
 	private static final Logger LOG = Logger.getLogger(ServiceNowNamespaceDAO.class);
-	private static final String ECS_NAMESPACE_DETAILS = "/ecs_namespace_details";
-	private static final String ECS_NAMESPACE_QUOTA = "/ecs_namespace_quota";
+	private static final String ECS_NAMESPACE_DETAILS = "/x_219618_ecs_dashb_ecs_namespace_details";
+	private static final String ECS_NAMESPACE_QUOTA = "/x_219618_ecs_dashb_ecs_namespace_quota";
+//	private static final String ECS_NAMESPACE_QUOTA = "/ecs_namespace_quota";
 
 	public ServiceNowNamespaceDAO(ServiceNowDAOConfig config) {
 		super(config);
@@ -44,7 +45,7 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	public void insert(NamespaceDetail namespaceDetail, Date collectionTime) {
 		try {
 			final String json = this.convertDetailsObjectToJson(namespaceDetail);
-			this.postData(this.url + ECS_NAMESPACE_DETAILS, json);
+			this.postData(ECS_NAMESPACE_DETAILS, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for namespace details ",e);
 		}
@@ -57,7 +58,7 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	public void insert(NamespaceQuota namespacequota, Date collectionTime) {
 		try {
 			final String json = this.convertQuotaObjectToJson(namespacequota);
-			this.postData(this.url + ECS_NAMESPACE_QUOTA, json);
+			this.postData(ECS_NAMESPACE_QUOTA, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for namespace quota ",e);
 		}

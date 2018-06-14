@@ -19,8 +19,8 @@ import com.emc.object.s3.bean.QueryObjectsResult;
 public class ServiceNowS3ObjectDAO extends ServiceNowDAO implements ObjectDAO {
 	
 	private static final Logger LOG = Logger.getLogger(ServiceNowS3ObjectDAO.class);
-	private static final String ECS_S3_LIST_OBJECTS = "/ecs_s3_objects_list";
-	private static final String ECS_S3_QUERY_OBJECTS = "/ecs_s3_objects_query";
+	private static final String ECS_S3_LIST_OBJECTS = "/x_219618_ecs_dashb_ecs_s3_objects_list";
+	private static final String ECS_S3_QUERY_OBJECTS = "/x_219618_ecs_dashb_ecs_s3_objects_query";
 	
 	/**
 	 * @param config

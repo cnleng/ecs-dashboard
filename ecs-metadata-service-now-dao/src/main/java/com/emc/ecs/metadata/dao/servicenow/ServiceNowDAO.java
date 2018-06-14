@@ -28,6 +28,7 @@ public abstract class ServiceNowDAO {
 	private static final Logger LOG = Logger.getLogger(ServiceNowDAO.class);
 	protected CloseableHttpClient client;
 	protected String url;
+	protected String api;
 
 	public ServiceNowDAO(ServiceNowDAOConfig config) {
 		final CredentialsProvider provider = new BasicCredentialsProvider();
@@ -36,28 +37,57 @@ public abstract class ServiceNowDAO {
 		provider.setCredentials(AuthScope.ANY, credentials);
 		this.client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
 		this.url = config.getInstanceUrl();
+		this.api = config.getApi();
 	}
-	
-	
+
 	/**
 	 * @param httpPost
 	 * @param json
 	 */
 	protected void postData(final String endPoint, final String json) {
 		try {
-			final HttpPost httpPost = new HttpPost(endPoint);
+			final HttpPost httpPost = new HttpPost(this.url + this.api + endPoint);
 			final HttpEntity body = new StringEntity(json, ContentType.APPLICATION_JSON);
 			httpPost.setEntity(body);
 			httpPost.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 			CloseableHttpResponse response = this.client.execute(httpPost);
 			try {
 				HttpEntity entity = response.getEntity();
+				int statusCode = response.getStatusLine().getStatusCode();
+				switch (statusCode) {
+				case 200:
+				case 201:
+				case 202:
+				case 203:
+				case 204:
+				case 205:
+				case 206:
+				case 207:
+				case 208:
+				case 226:
+					break;
+				default:
+					throw new Exception(
+							"HTTP Request Error. Status Code [" + statusCode + "], Reason:" + response.getStatusLine().getReasonPhrase());
+				}
 				EntityUtils.consume(entity);
 			} finally {
-				response.close();
+				if (response != null) {
+					response.close();
+				}
 			}
-		} catch (IOException e) {
-			LOG.error("An error occured while posting data to service-now instance: ",e);
+		} catch (Exception e) {
+			LOG.error("An error occured while posting data to service-now instance: ", e);
+		}
+	}
+
+	protected void close() {
+		if (this.client != null) {
+			try {
+				this.client.close();
+			} catch (IOException e) {
+				LOG.warn("ServiceNOW Http Connection was not properly shut down: ", e);
+			}
 		}
 	}
 }

@@ -51,6 +51,7 @@ public class S3ObjectServiceImpl implements S3ObjectService {
 		// Instantiate ElasticSearch DAO
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
+		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);

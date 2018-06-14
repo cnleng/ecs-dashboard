@@ -28,8 +28,8 @@ import Vdc.VdcDetail;
 public class ServiceNowVdcDAO extends ServiceNowDAO implements VdcDAO {
 
 	private static final Logger LOG = Logger.getLogger(ServiceNowVdcDAO.class);
-	private static final String ECS_VDC_DETAILS = "/ecs_vdc_details";
-	private static final String ECS_BUCKET_OWNERS = "/ecs_bucket_owners";
+	private static final String ECS_VDC_DETAILS = "/x_219618_ecs_dashb_ecs_vdc_details";
+	private static final String ECS_BUCKET_OWNERS = "/x_219618_ecs_dashb_ecs_bucket_owners";
 
 	/**
 	 * @param config
@@ -59,7 +59,7 @@ public class ServiceNowVdcDAO extends ServiceNowDAO implements VdcDAO {
 	public void insert(VdcDetails vdcDetails, Date collectionTime) {
 		try {
 			final String json = this.convertVdcDEtailsToJson(vdcDetails);
-			this.postData(this.url + ECS_VDC_DETAILS, json);
+			this.postData(ECS_VDC_DETAILS, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for vdc details ", e);
 		}
@@ -75,7 +75,7 @@ public class ServiceNowVdcDAO extends ServiceNowDAO implements VdcDAO {
 	public void insert(List<BucketOwner> bucketOwners, Date collectionTime) {
 		try {
 			final String json = this.convertBucketOwnerToJson(bucketOwners);
-			this.postData(this.url + ECS_BUCKET_OWNERS, json);
+			this.postData(ECS_BUCKET_OWNERS, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for bucket owners ", e);
 		}
@@ -103,15 +103,17 @@ public class ServiceNowVdcDAO extends ServiceNowDAO implements VdcDAO {
 	private String convertBucketOwnerToJson(List<BucketOwner> bucketOwners) throws JsonProcessingException {
 		final ObjectMapper mapper = new ObjectMapper();
 		final List<Map<String, Object>> jsonMap = new ArrayList<>();
-		for (BucketOwner bucketOwner: bucketOwners) {
-			final Map<String,Object> map = new HashMap<>();
-			map.put("vdcid", bucketOwner.getVdcId());
-			map.put("bucketkey", bucketOwner.getBucketKey());
-			jsonMap.add(map);
+		if (bucketOwners != null && !bucketOwners.isEmpty()) {
+			for (BucketOwner bucketOwner : bucketOwners) {
+				final Map<String, Object> map = new HashMap<>();
+				map.put("vdcid", bucketOwner.getVdcId());
+				map.put("bucketkey", bucketOwner.getBucketKey());
+				jsonMap.add(map);
+			}
 		}
 		return mapper.writeValueAsString(jsonMap);
 	}
-	
+
 	/**
 	 * 
 	 * @param quota
@@ -123,7 +125,7 @@ public class ServiceNowVdcDAO extends ServiceNowDAO implements VdcDAO {
 		List<VdcDetail> vdcDetailList = vdcDetails.getVdcDetails();
 		final List<Map<String, Object>> jsonMap = new ArrayList<>();
 		for (VdcDetail detail : vdcDetailList) {
-			final Map<String,Object> map = new HashMap<>();
+			final Map<String, Object> map = new HashMap<>();
 			map.put("vdcid", detail.getVdcId());
 			map.put("vdcname", detail.getVdcName());
 			map.put("intervdcendpoints", detail.getInterVdcEndPoints());
