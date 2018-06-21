@@ -47,7 +47,7 @@ public class ServiceNowBillingDAO extends ServiceNowDAO implements BillingDAO {
 	@Override
 	public void insert(NamespaceBillingInfo billingData, Date collectionTime) {
 		try {
-			final String json = this.convertBillingInfoToJson(billingData);
+			final String json = this.convertBillingInfoToJson(billingData, collectionTime);
 			this.postData(ECS_NAMESPACE_BILLING_INFOS, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for namespace billing infos ", e);
@@ -60,14 +60,14 @@ public class ServiceNowBillingDAO extends ServiceNowDAO implements BillingDAO {
 	@Override
 	public void insert(ObjectBuckets bucketResponse, Date collectionTime) {
 		try {
-			final String json = this.convertObjectBucketToJson(bucketResponse);
+			final String json = this.convertObjectBucketToJson(bucketResponse, collectionTime);
 			this.postData(ECS_OBJECT_BUCKETS, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for Object Buckets ", e);
 		}
 	}
 	
-	private String convertObjectBucketToJson(ObjectBuckets bucket) throws JsonProcessingException {
+	private String convertObjectBucketToJson(ObjectBuckets bucket, Date collectionTime) throws JsonProcessingException {
 		final ObjectMapper mapper = new ObjectMapper();
 		List<ObjectBucket> objectBuckets = bucket.getObjectBucket();
 		final List<Map<String, Object>> jsonMap = new ArrayList<>();
@@ -109,6 +109,7 @@ public class ServiceNowBillingDAO extends ServiceNowDAO implements BillingDAO {
 				map.put("owner", objectBucket.getOwner());
 				map.put("vpool", objectBucket.getVpool());
 				map.put("locked", objectBucket.getLocked());
+				map.put("collectiontime", collectionTime);
 				jsonMap.add(map);
 			}
 		} else {
@@ -122,7 +123,7 @@ public class ServiceNowBillingDAO extends ServiceNowDAO implements BillingDAO {
 		return mapper.writeValueAsString(jsonMap);
 	}
 	
-	private String convertBillingInfoToJson(NamespaceBillingInfo billingData) throws JsonProcessingException {
+	private String convertBillingInfoToJson(NamespaceBillingInfo billingData, Date collectionTime) throws JsonProcessingException {
 		final ObjectMapper mapper = new ObjectMapper();
 		List<BucketBillingInfo> bucketBillingInfos = billingData.getBucketBillingInfo();
 		final List<Map<String, Object>> jsonMap = new ArrayList<>();
@@ -139,6 +140,7 @@ public class ServiceNowBillingDAO extends ServiceNowDAO implements BillingDAO {
 				map.put("vpoolid", bucketBillingInfo.getVpoolId());
 				map.put("tagset", bucketBillingInfo.getTagSet());
 				map.put("apitype", bucketBillingInfo.getApiType());
+				map.put("collectiontime", collectionTime);
 				jsonMap.add(map);
 			}
 		} else {
@@ -149,6 +151,7 @@ public class ServiceNowBillingDAO extends ServiceNowDAO implements BillingDAO {
 			map.put("totalobjects", billingData.getTotalObjects());
 			map.put("namespace", billingData.getNamespace());
 			map.put("sampletime", billingData.getSampleTime());
+			map.put("collectiontime", collectionTime);
 			jsonMap.add(map);
 		}
 		return mapper.writeValueAsString(jsonMap);

@@ -4,14 +4,12 @@
 package com.emc.ecs.metadata.services.impl;
 
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
-import com.emc.ecs.management.entity.NamespaceBillingInfo;
-import com.emc.ecs.management.entity.ObjectBuckets;
 import com.emc.ecs.metadata.configuration.EcsConfiguration;
 import com.emc.ecs.metadata.configuration.ServiceNowConfiguration;
 import com.emc.ecs.metadata.dao.BillingDAO;
@@ -19,6 +17,8 @@ import com.emc.ecs.metadata.dao.servicenow.ServiceNowBillingDAO;
 import com.emc.ecs.metadata.dao.servicenow.ServiceNowDAOConfig;
 import com.emc.ecs.metadata.rest.bo.BillingBO;
 import com.emc.ecs.metadata.services.BillingService;
+import com.emc.ecs.metadata.tasks.BillingTask;
+import com.emc.ecs.metadata.utils.Constants.TaskType;
 
 /**
  * @author nlengc
@@ -32,64 +32,8 @@ public class BillingServiceImpl implements BillingService {
 	private ServiceNowConfiguration serviceNowConfiguration;
 	@Autowired
 	private EcsConfiguration ecsConfiguration;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.emc.ecs.metadata.services.BillingService#getNamespaceBillingInfo(java
-	 * .util.Date)
-	 */
-	@Override
-	public List<NamespaceBillingInfo> getNamespaceBillingInfo(Date collectionTime) {
-		BillingDAO billingDAO = null;
-		// Instantiate ServiceNow
-		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
-		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
-		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
-		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
-		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
-		serviceNowDAOConfig.setCollectionTime(collectionTime);
-		billingDAO = new ServiceNowBillingDAO(serviceNowDAOConfig);
-
-		// instantiate billing BO
-		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
-
-		// Start collection
-		List<NamespaceBillingInfo> namespaceBillingInfos = billingBO.collectBillingData(collectionTime); 
-		billingBO.shutdown();
-		return namespaceBillingInfos;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.emc.ecs.metadata.services.BillingService#getObjectBuckets(java.util.
-	 * Date)
-	 */
-	@Override
-	public List<ObjectBuckets> getObjectBuckets(Date collectionTime) {
-		BillingDAO billingDAO = null;
-		// Instantiate ServiceNow
-		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
-		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
-		serviceNowDAOConfig.setApi(serviceNowConfiguration.getApi());
-		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
-		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
-		serviceNowDAOConfig.setCollectionTime(collectionTime);
-		billingDAO = new ServiceNowBillingDAO(serviceNowDAOConfig);
-
-		// instantiate billing BO
-		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
-
-		// Start collection
-		List<ObjectBuckets> objectBuckets = billingBO.collectObjectBuckets(collectionTime);
-		billingBO.shutdown();
-		return objectBuckets;
-	}
+	@Autowired
+	private TaskExecutor ecsPoolTaskExecutor;
 
 	@Override
 	public void postNamespaceBillingInfo(Date collectionTime) {
@@ -107,9 +51,8 @@ public class BillingServiceImpl implements BillingService {
 		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
 				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
 
-		// Start collection
-		billingBO.collectBillingData(collectionTime); 
-		billingBO.shutdown();
+		BillingTask billingTask = new BillingTask(collectionTime, billingBO, TaskType.NamespaceBillingInfos);
+		ecsPoolTaskExecutor.execute(billingTask);
 	}
 
 	@Override
@@ -129,8 +72,8 @@ public class BillingServiceImpl implements BillingService {
 				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
 
 		// Start collection
-		billingBO.collectObjectBuckets(collectionTime);
-		billingBO.shutdown();
+		BillingTask billingTask = new BillingTask(collectionTime, billingBO, TaskType.ObjectBuckets);
+		ecsPoolTaskExecutor.execute(billingTask);
 	}
 
 }

@@ -119,11 +119,7 @@ public class BillingBO {
 
 		final List<NamespaceBillingInfo> namespaceBillingInfos = new ArrayList<>();
 		for (Namespace namespace : namespaceList) {
-
-			// ===============================================
 			// Initial billing request for current namespace
-			// ===============================================
-
 			NamespaceRequest namespaceRequest = new NamespaceRequest();
 			namespaceRequest.setName(namespace.getName());
 			if (objectBucketsPerNamespace.get(namespace.getName()) != null

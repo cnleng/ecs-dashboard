@@ -32,6 +32,10 @@ public class Constants {
 
 	public static final String DATA_DATE_PATTERN = "yyyy-MM-dd";
 	public static final SimpleDateFormat DATA_DATE_FORMAT = new SimpleDateFormat(DATA_DATE_PATTERN);
+	
+	public enum TaskType {
+		NamespaceDetails, NamespaceQuotas, NamespaceBillingInfos, ObjectBuckets, VdcDetails, BucketOwners, S3ObjectVersions, S3ObjectsData, S3ObjectsModified
+	}
 
 	/**
 	 * 

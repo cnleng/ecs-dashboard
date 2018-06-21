@@ -44,7 +44,7 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	@Override
 	public void insert(NamespaceDetail namespaceDetail, Date collectionTime) {
 		try {
-			final String json = this.convertDetailsObjectToJson(namespaceDetail);
+			final String json = this.convertDetailsObjectToJson(namespaceDetail, collectionTime);
 			this.postData(ECS_NAMESPACE_DETAILS, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for namespace details ",e);
@@ -57,7 +57,7 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	@Override
 	public void insert(NamespaceQuota namespacequota, Date collectionTime) {
 		try {
-			final String json = this.convertQuotaObjectToJson(namespacequota);
+			final String json = this.convertQuotaObjectToJson(namespacequota, collectionTime);
 			this.postData(ECS_NAMESPACE_QUOTA, json);
 		} catch (JsonProcessingException e) {
 			LOG.error("An error occured while parsing Json for namespace quota ",e);
@@ -78,12 +78,13 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	private String convertQuotaObjectToJson(NamespaceQuota quota) throws JsonProcessingException {
+	private String convertQuotaObjectToJson(NamespaceQuota quota, Date collectionTime) throws JsonProcessingException {
 		final ObjectMapper mapper = new ObjectMapper();
 		final Map<String, Object> jsonMap = new HashMap<>();
 		jsonMap.put("namespace", quota.getNamespace());
 		jsonMap.put("blocksize", quota.getBlockSize());
 		jsonMap.put("notificationsize", quota.getNotificationSize());
+		jsonMap.put("collectiontime", collectionTime);
 		return mapper.writeValueAsString(jsonMap);
 	}
 
@@ -93,7 +94,7 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 	 * @return
 	 * @throws JsonProcessingException
 	 */
-	private String convertDetailsObjectToJson(NamespaceDetail namespaceDetail) throws JsonProcessingException {
+	private String convertDetailsObjectToJson(NamespaceDetail namespaceDetail, Date collectionTime) throws JsonProcessingException {
 		final ObjectMapper mapper = new ObjectMapper();
 		final Map<String, Object> jsonMap = new HashMap<>();
 		jsonMap.put("id", namespaceDetail.getId());
@@ -114,6 +115,7 @@ public class ServiceNowNamespaceDAO extends ServiceNowDAO implements NamespaceDA
 		jsonMap.put("creationtime", namespaceDetail.getCreationTime());
 		jsonMap.put("defaultbucketblocksize", namespaceDetail.getDefaultBucketBlockSize());
 		jsonMap.put("externalgroupadmins", namespaceDetail.getExternalGroupAdmins());
+		jsonMap.put("collectiontime", collectionTime);
 		return mapper.writeValueAsString(jsonMap);
 	}
 }

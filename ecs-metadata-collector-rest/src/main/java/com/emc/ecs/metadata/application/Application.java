@@ -10,17 +10,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
  * @author nlengc
  *
  */
 @SpringBootApplication
-//@EnableAsync
-//@EnableScheduling
+@EnableAsync
 @ComponentScan(basePackages = { "com.emc.ecs.metadata.*" })
 public class Application {
 	private static final Logger LOG = Logger.getLogger(Application.class);
+	private static final String THREAD_NAME_PREFIX = "ECS-Executor-";
 	private static final int CORE_POOL_SIZE = 5;
 	private static final int MAX_POOL_SIZE = 10;
 	private static final int QUEUE_CAPACITY = 500;
@@ -36,13 +39,15 @@ public class Application {
 		};
 	}
 
-//	@Bean
-//	public static PropertySourcesPlaceholderConfigurer properties() {
-//	  PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
-//	  YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-//	  yaml.setResources(new FileSystemResource(CONFIGURATION_FILE));
-//	  propertySourcesPlaceholderConfigurer.setProperties(yaml.getObject());
-//	  return propertySourcesPlaceholderConfigurer;
-//	}
+    @Bean(name = "ecsPoolTaskExecutor")
+    public TaskExecutor ecsPoolTaskExecutor() {
+        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(Runtime.getRuntime().availableProcessors());
+        executor.setMaxPoolSize(Runtime.getRuntime().availableProcessors());
+        executor.setQueueCapacity(Runtime.getRuntime().availableProcessors());
+        executor.setThreadNamePrefix(THREAD_NAME_PREFIX);
+        executor.initialize();
+        return executor;
+    }
 	
 }

@@ -65,11 +65,9 @@ public class S3ObjectBO {
 
 		// collect S3 user Id and credentials
 		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
-
 		// Collect bucket details
 		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
 		billingBO.getObjectBucketData(objectBucketMap);
-
 		Map<String, S3JerseyClient> s3ObjectClientMap = null;
 
 		try {
@@ -78,25 +76,19 @@ public class S3ObjectBO {
 
 			// collect objects for all users
 			for (ObjectUserDetails objectUserDetails : objectUserDetailsList) {
-
 				if (objectUserDetails.getObjectUser().getUserId() == null
 						|| objectUserDetails.getSecretKeys().getSecretKey1() == null) {
-					// some user don't have a secret key configured
-					// in that case we just skip over that user
 					continue;
 				}
 
 				String userId = objectUserDetails.getObjectUser().getUserId().toString();
-
 				S3JerseyClient s3JerseyClient = s3ObjectClientMap.get(userId);
 				String namespace = objectUserDetails.getObjectUser().getNamespace().toString();
 
 				if (s3JerseyClient != null && namespace != null) {
-
 					ObjectCollectionConfig collectionConfig = new ObjectCollectionConfig(s3JerseyClient, namespace,
 							this.objectDAO, objectBucketMap, collectionTime, objectCount, threadPoolExecutor, futures,
 							queryCriteria);
-
 					NamespaceObjectCollection namespaceObjectCollection = new NamespaceObjectCollection(
 							collectionConfig);
 
@@ -147,8 +139,6 @@ public class S3ObjectBO {
 
 				if (objectUserDetails.getObjectUser().getUserId() == null
 						|| objectUserDetails.getSecretKeys().getSecretKey1() == null) {
-					// some user don't have a secret key configured
-					// in that case we just skip over that user
 					continue;
 				}
 
@@ -159,12 +149,7 @@ public class S3ObjectBO {
 				if (s3JerseyClient != null && namespace != null) {
 
 					ObjectCollectionConfig collectionConfig = new ObjectCollectionConfig(s3JerseyClient, namespace,
-							objectDAO, objectBucketMap, collectionTime, objectCount, threadPoolExecutor, futures, null // no
-																														// criteria
-																														// required
-																														// here
-					);
-
+							objectDAO, objectBucketMap, collectionTime, objectCount, threadPoolExecutor, futures, null);
 					NamespaceObjectVersionCollection namespaceObjectVersionCollection = new NamespaceObjectVersionCollection(
 							collectionConfig);
 
@@ -200,29 +185,22 @@ public class S3ObjectBO {
 			List<String> ecsObjectHosts) {
 
 		Map<String, S3JerseyClient> s3JerseyClientList = new HashMap<String, S3JerseyClient>();
-
 		// collect objects for all users
 		for (ObjectUserDetails objectUserDetails : objectUserDetailsList) {
-
 			if (objectUserDetails.getObjectUser().getUserId() == null
 					|| objectUserDetails.getSecretKeys().getSecretKey1() == null) {
-				// some user don't have a secret key configured
-				// in that case we just skip over that user
 				continue;
 			}
 
 			// Create object client user
 			Vdc vdc = new Vdc((String[]) this.ecsObjectHosts.toArray());
 			S3Config s3config = new S3Config(Protocol.HTTP, vdc);
-
 			// in all cases, you need to provide your credentials
 			s3config.withIdentity(objectUserDetails.getObjectUser().getUserId().toString())
 					.withSecretKey(objectUserDetails.getSecretKeys().getSecretKey1());
-
 			s3config.setSmartClient(true);
 			URLConnectionClientHandler urlHandler = new URLConnectionClientHandler();
 			S3JerseyClient s3JerseyClient = new S3JerseyClient(s3config, urlHandler);
-
 			s3JerseyClientList.put(objectUserDetails.getObjectUser().getUserId().toString(), s3JerseyClient);
 		}
 
@@ -238,4 +216,5 @@ public class S3ObjectBO {
 	public void shutdown() {
 		billingBO.shutdown();
 	}
+
 }
