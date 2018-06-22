@@ -14,7 +14,7 @@ import com.emc.ecs.metadata.utils.Constants.TaskType;
  *
  */
 public class BillingTask implements Runnable {
-	
+
 	private static AtomicLong objectCount = new AtomicLong(0L);
 	private Date collectionTime;
 	private BillingBO billingBO;
@@ -26,22 +26,27 @@ public class BillingTask implements Runnable {
 		this.billingBO = billingBO;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
 	@Override
 	public void run() {
-		switch (this.taskType) {
-		case NamespaceBillingInfos:
-			billingBO.collectBillingData(this.collectionTime);
-			break;
-		case ObjectBuckets:
-			billingBO.collectObjectBuckets(this.collectionTime);
-			break;
-		default:
-			break;
+		try {
+			switch (this.taskType) {
+			case NamespaceBillingInfos:
+				billingBO.collectBillingData(this.collectionTime);
+				break;
+			case ObjectBuckets:
+				billingBO.collectObjectBuckets(this.collectionTime);
+				break;
+			default:
+				break;
+			}
+		} finally {
+			billingBO.shutdown();
 		}
-		billingBO.shutdown();
 	}
 
 }

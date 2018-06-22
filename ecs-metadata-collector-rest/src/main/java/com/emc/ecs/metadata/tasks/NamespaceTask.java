@@ -33,17 +33,20 @@ public class NamespaceTask implements Runnable {
 	 */
 	@Override
 	public void run() {
-		switch (this.taskType) {
-		case NamespaceDetails:
-			namespaceBO.collectNamespaceDetails(this.collectionTime);
-			break;
-		case NamespaceQuotas:
-			namespaceBO.collectNamespaceQuota(this.collectionTime);
-			break;
-		default:
-			break;
+		try {
+			switch (this.taskType) {
+			case NamespaceDetails:
+				namespaceBO.collectNamespaceDetails(this.collectionTime);
+				break;
+			case NamespaceQuotas:
+				namespaceBO.collectNamespaceQuota(this.collectionTime);
+				break;
+			default:
+				break;
+			}
+		} finally {
+			namespaceBO.shutdown();
 		}
-		namespaceBO.shutdown();
 	}
 
 }

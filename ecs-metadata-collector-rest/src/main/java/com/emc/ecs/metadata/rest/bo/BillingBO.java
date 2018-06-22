@@ -30,6 +30,7 @@ import com.emc.ecs.management.entity.ObjectUserSecretKeys;
 import com.emc.ecs.management.entity.ObjectUsers;
 import com.emc.ecs.management.entity.ObjectUsersRequest;
 import com.emc.ecs.metadata.dao.BillingDAO;
+import com.emc.ecs.metadata.dao.servicenow.ServiceNowDAO;
 
 /**
  * @author nlengc
@@ -352,7 +353,9 @@ public class BillingBO {
 		if (this.client != null) {
 			client.shutdown();
 		}
-
+		if (billingDAO!=null) {
+			((ServiceNowDAO)billingDAO).close();
+		}
 	}
 
 	/**
@@ -364,21 +367,16 @@ public class BillingBO {
 
 		// Start collecting billing data from ECS systems
 		List<Namespace> namespaceList = new ArrayList<Namespace>();
-
 		// collect namespace names
 		ListNamespaceRequest listNamespaceRequest = new ListNamespaceRequest();
-
 		// first batch
 		ListNamespacesResult namespacesResult = client.listNamespaces(listNamespaceRequest);
 		namespaceList.addAll(namespacesResult.getNamespaces());
 
 		// n subsequent batches
 		while (namespacesResult.getNextMarker() != null) {
-
 			listNamespaceRequest.setNextMarker(namespacesResult.getNextMarker());
-
 			namespacesResult = client.listNamespaces(listNamespaceRequest);
-
 			if (namespacesResult.getNamespaces() != null) {
 				namespaceList.addAll(namespacesResult.getNamespaces());
 			}

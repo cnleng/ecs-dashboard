@@ -81,7 +81,7 @@ public abstract class ServiceNowDAO {
 		}
 	}
 
-	protected void close() {
+	public final void close() {
 		if (this.client != null) {
 			try {
 				this.client.close();

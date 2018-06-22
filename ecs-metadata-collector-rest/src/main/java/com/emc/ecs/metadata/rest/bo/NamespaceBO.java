@@ -19,6 +19,7 @@ import com.emc.ecs.management.entity.NamespaceDetail;
 import com.emc.ecs.management.entity.NamespaceQuota;
 import com.emc.ecs.management.entity.NamespaceRequest;
 import com.emc.ecs.metadata.dao.NamespaceDAO;
+import com.emc.ecs.metadata.dao.servicenow.ServiceNowDAO;
 
 /**
  * @author nlengc
@@ -143,6 +144,9 @@ public class NamespaceBO {
 	public void shutdown() {
 		if(this.client != null) {
 			client.shutdown();
+		}
+		if (namespaceDAO!=null) {
+			((ServiceNowDAO)namespaceDAO).close();
 		}
 	}
 

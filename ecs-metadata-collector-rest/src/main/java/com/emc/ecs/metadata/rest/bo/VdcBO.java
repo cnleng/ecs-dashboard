@@ -17,6 +17,7 @@ import com.emc.ecs.management.client.VdcManagementClientConfig;
 import com.emc.ecs.management.entity.BucketOwner;
 import com.emc.ecs.management.entity.VdcDetails;
 import com.emc.ecs.metadata.dao.VdcDAO;
+import com.emc.ecs.metadata.dao.servicenow.ServiceNowDAO;
 
 /**
  * @author nlengc
@@ -76,7 +77,6 @@ public class VdcBO {
 		objCounter = objCounter + bucketOwners.size();
 		// Push collected details into datastore
 		if (vdcDAO != null) {
-			LOGGER.info("Pushing all bucket owner to ServiceNow. ");
 			vdcDAO.insert(bucketOwners, collectionTime);
 		}
 		// peg global counter
@@ -87,6 +87,9 @@ public class VdcBO {
 	public void shutdown() {
 		if (this.client != null) {
 			client.shutdown();
+		}
+		if (vdcDAO!=null) {
+			((ServiceNowDAO)vdcDAO).close();
 		}
 	}
 }
