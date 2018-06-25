@@ -4,7 +4,6 @@
 package com.emc.ecs.metadata.services.impl;
 
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -27,7 +26,6 @@ import com.emc.ecs.metadata.utils.Constants.TaskType;
 @Service
 public class NamespaceServiceImpl implements NamespaceService {
 
-	private static AtomicLong objectCount = new AtomicLong(0L);
 	@Autowired
 	private ServiceNowConfiguration serviceNowConfiguration;
 	@Autowired
@@ -49,7 +47,7 @@ public class NamespaceServiceImpl implements NamespaceService {
 
 		// instantiate namespace BO
 		NamespaceBO namespaceBO = new NamespaceBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO);
 		
 		NamespaceTask namespaceTask = new NamespaceTask(collectionTime, namespaceBO, TaskType.NamespaceDetails);
 		ecsPoolTaskExecutor.execute(namespaceTask);
@@ -69,7 +67,7 @@ public class NamespaceServiceImpl implements NamespaceService {
 
 		// instantiate billing BO
 		NamespaceBO namespaceBO = new NamespaceBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), namespaceDAO);
 
 		NamespaceTask namespaceTask = new NamespaceTask(collectionTime, namespaceBO, TaskType.NamespaceQuotas);
 		ecsPoolTaskExecutor.execute(namespaceTask);

@@ -41,15 +41,13 @@ public class BillingBO {
 	private final static Logger LOGGER = Logger.getLogger(BillingBO.class);
 	private ManagementClient client;
 	private BillingDAO billingDAO;
-	private AtomicLong objectCount;
 
 	public BillingBO(String mgmtAccessKey, String mgmtSecretKey, List<String> hosts, Integer port,
-			BillingDAO billingDAO, AtomicLong objectCount) {
+			BillingDAO billingDAO) {
 		// client config
 		ManagementClientConfig clientConfig = new ManagementClientConfig(mgmtAccessKey, mgmtSecretKey, port, hosts);
 		this.client = new ManagementClient(clientConfig);
 		this.billingDAO = billingDAO;
-		this.objectCount = objectCount;
 	}
 
 	/**
@@ -101,7 +99,7 @@ public class BillingBO {
 	 * @param collectionTime
 	 *            - Collection Time
 	 */
-	public List<NamespaceBillingInfo> collectBillingData(Date collectionTime) {
+	public List<NamespaceBillingInfo> collectBillingData(Date collectionTime, AtomicLong objectCount ) {
 
 		// Collect the object bucket data first in order to use some of
 		// the fields from object bucket
@@ -111,7 +109,7 @@ public class BillingBO {
 		// Collect bucket data and write to datastore
 		// secondly returns classified data per namespace
 		// and also per namespace+bucketname
-		collectObjectBucketData(objectBucketsPerNamespace, objectBuckets, collectionTime);
+		collectObjectBucketData(objectBucketsPerNamespace, objectBuckets, collectionTime, objectCount);
 
 		// Start collecting billing data from ECS systems
 		List<Namespace> namespaceList = getNamespaces();
@@ -196,7 +194,7 @@ public class BillingBO {
 		}
 
 		// peg global counter
-		this.objectCount.getAndAdd(objCounter);
+		objectCount.getAndAdd(objCounter);
 		return namespaceBillingInfos;
 
 	}
@@ -207,12 +205,12 @@ public class BillingBO {
 	 * @param objectBucketMap
 	 *            - Object Bucket Map
 	 */
-	public void getObjectBucketData(Map<NamespaceBucketKey, ObjectBucket> objectBucketMap) {
+	public void getObjectBucketData(Map<NamespaceBucketKey, ObjectBucket> objectBucketMap, AtomicLong objectCount) {
 
 		// no namespace map required
 		// no collection time required
 		// no DAO required
-		collectObjectBucketData(null, objectBucketMap, null);
+		collectObjectBucketData(null, objectBucketMap, null, objectCount);
 
 	}
 
@@ -221,8 +219,8 @@ public class BillingBO {
 	 * @param collectionTime
 	 * @return
 	 */
-	public List<ObjectBuckets> collectObjectBuckets(Date collectionTime) {
-		return this.collectObjectBucketData(null, null, collectionTime);
+	public List<ObjectBuckets> collectObjectBuckets(Date collectionTime, AtomicLong objectCount ) {
+		return this.collectObjectBucketData(null, null, collectionTime, objectCount);
 	}
 
 	/**
@@ -236,7 +234,7 @@ public class BillingBO {
 	 *            - Billing DAO Object
 	 */
 	private List<ObjectBuckets> collectObjectBucketData(Map<String, Set<ObjectBucket>> objectPerNamespaceMap,
-			Map<NamespaceBucketKey, ObjectBucket> objectBucketMap, Date collectionTime) {
+			Map<NamespaceBucketKey, ObjectBucket> objectBucketMap, Date collectionTime, AtomicLong objectCount) {
 
 		// Start collecting billing data from ECS systems
 		List<Namespace> namespaceList = getNamespaces();
@@ -345,7 +343,7 @@ public class BillingBO {
 		}
 
 		// peg global counter
-		this.objectCount.getAndAdd(objCounter);
+		objectCount.getAndAdd(objCounter);
 		return objectBuckets;
 	}
 

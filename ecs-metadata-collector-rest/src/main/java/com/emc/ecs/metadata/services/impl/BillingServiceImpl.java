@@ -4,7 +4,6 @@
 package com.emc.ecs.metadata.services.impl;
 
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
@@ -27,7 +26,6 @@ import com.emc.ecs.metadata.utils.Constants.TaskType;
 @Service
 public class BillingServiceImpl implements BillingService {
 	
-	private static AtomicLong objectCount = new AtomicLong(0L);
 	@Autowired
 	private ServiceNowConfiguration serviceNowConfiguration;
 	@Autowired
@@ -49,7 +47,7 @@ public class BillingServiceImpl implements BillingService {
 
 		// instantiate billing BO
 		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO);
 
 		BillingTask billingTask = new BillingTask(collectionTime, billingBO, TaskType.NamespaceBillingInfos);
 		ecsPoolTaskExecutor.execute(billingTask);
@@ -69,7 +67,7 @@ public class BillingServiceImpl implements BillingService {
 
 		// instantiate billing BO
 		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO);
 
 		// Start collection
 		BillingTask billingTask = new BillingTask(collectionTime, billingBO, TaskType.ObjectBuckets);

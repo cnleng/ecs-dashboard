@@ -4,15 +4,11 @@
 package com.emc.ecs.metadata.services.impl;
 
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 
-import com.emc.ecs.management.entity.BucketOwner;
-import com.emc.ecs.management.entity.VdcDetails;
 import com.emc.ecs.metadata.configuration.EcsConfiguration;
 import com.emc.ecs.metadata.configuration.ServiceNowConfiguration;
 import com.emc.ecs.metadata.dao.VdcDAO;
@@ -30,7 +26,6 @@ import com.emc.ecs.metadata.utils.Constants.TaskType;
 @Service
 public class VdcServiceImpl implements VdcService {
 	
-	private static AtomicLong objectCount = new AtomicLong(0L);
 	@Autowired
 	private ServiceNowConfiguration serviceNowConfiguration;
 	@Autowired
@@ -52,7 +47,7 @@ public class VdcServiceImpl implements VdcService {
 
 		// instantiate BO
 		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), vdcDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), vdcDAO);
 
 		// Start collection
 		VdcTask vdcTask = new VdcTask(collectionTime, vdcBO, TaskType.VdcDetails);
@@ -73,7 +68,7 @@ public class VdcServiceImpl implements VdcService {
 
 		// instantiate BO
 		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), ecsConfiguration.getEcsAlternativePort(), vdcDAO, objectCount);
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), ecsConfiguration.getEcsAlternativePort(), vdcDAO);
 
 		// Start collection
 		VdcTask vdcTask = new VdcTask(collectionTime, vdcBO, TaskType.BucketOwners);

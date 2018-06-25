@@ -67,7 +67,7 @@ public class S3ObjectBO {
 		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
 		// Collect bucket details
 		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
-		billingBO.getObjectBucketData(objectBucketMap);
+		billingBO.getObjectBucketData(objectBucketMap, this.objectCount);
 		Map<String, S3JerseyClient> s3ObjectClientMap = null;
 
 		try {
@@ -127,7 +127,7 @@ public class S3ObjectBO {
 
 		// Collect bucket details
 		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
-		billingBO.getObjectBucketData(objectBucketMap);
+		billingBO.getObjectBucketData(objectBucketMap, this.objectCount);
 		Map<String, S3JerseyClient> s3ObjectClientMap = null;
 
 		try {

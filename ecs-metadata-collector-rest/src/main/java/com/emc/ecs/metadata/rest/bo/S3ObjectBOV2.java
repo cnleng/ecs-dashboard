@@ -3,7 +3,6 @@
  */
 package com.emc.ecs.metadata.rest.bo;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,39 +34,24 @@ public class S3ObjectBOV2 {
 	private BillingBO billingBO;
 	private List<String> ecsObjectHosts;
 	private ObjectDAO objectDAO;
-	private ThreadPoolExecutor threadPoolExecutor;
-	private Queue<Future<?>> futures;
-	private AtomicLong objectCount;
 
-	public S3ObjectBOV2(BillingBO billingBO, List<String> ecsObjectHosts, ObjectDAO objectDAO,
-			ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, AtomicLong objectCount) {
+	public S3ObjectBOV2(BillingBO billingBO, List<String> ecsObjectHosts, ObjectDAO objectDAO) {
 		this.billingBO = billingBO;
 		this.ecsObjectHosts = ecsObjectHosts;
-		this.threadPoolExecutor = threadPoolExecutor;
-		this.futures = futures;
 		this.objectDAO = objectDAO;
-		this.objectCount = objectCount;
 	}
 
-	public ThreadPoolExecutor getThreadPool() {
-		return threadPoolExecutor;
+	public void collectObjectData(Date collectionTime,ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures,AtomicLong objectCount) {
+		collectObjectData(collectionTime, threadPoolExecutor, futures, null, objectCount);
 	}
 
-	public Collection<Future<?>> getFutures() {
-		return futures;
-	}
-
-	public void collectObjectData(Date collectionTime) {
-		collectObjectData(collectionTime, null);
-	}
-
-	public void collectObjectData(Date collectionTime, String queryCriteria) {
+	public void collectObjectData(Date collectionTime, ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, String queryCriteria, AtomicLong objectCount) {
 
 		// collect S3 user Id and credentials
 		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
 		// Collect bucket details
 		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
-		billingBO.getObjectBucketData(objectBucketMap);
+		billingBO.getObjectBucketData(objectBucketMap, objectCount);
 		Map<String, S3JerseyClient> s3ObjectClientMap = null;
 
 		try {
@@ -120,14 +104,14 @@ public class S3ObjectBOV2 {
 
 	}
 
-	public void collectObjectVersionData(Date collectionTime) {
+	public void collectObjectVersionData(Date collectionTime, ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, AtomicLong objectCount) {
 
 		// collect S3 user Id and credentials
 		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
 
 		// Collect bucket details
 		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
-		billingBO.getObjectBucketData(objectBucketMap);
+		billingBO.getObjectBucketData(objectBucketMap, objectCount);
 		Map<String, S3JerseyClient> s3ObjectClientMap = null;
 
 		try {

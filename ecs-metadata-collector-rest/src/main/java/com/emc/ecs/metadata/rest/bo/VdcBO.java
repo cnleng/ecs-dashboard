@@ -28,27 +28,22 @@ public class VdcBO {
 	private final static Logger LOGGER = Logger.getLogger(VdcBO.class);
 	private ManagementClient client;
 	private VdcDAO vdcDAO;
-	private AtomicLong objectCount;
 
-	public VdcBO(String mgmtAccessKey, String mgmtSecretKey, List<String> hosts, Integer port, VdcDAO vdcDAO,
-			AtomicLong objectCount) {
+	public VdcBO(String mgmtAccessKey, String mgmtSecretKey, List<String> hosts, Integer port, VdcDAO vdcDAO) {
 		// client config
 		ManagementClientConfig clientConfig = new ManagementClientConfig(mgmtAccessKey, mgmtSecretKey, port, hosts);
 		this.client = new ManagementClient(clientConfig);
 		this.vdcDAO = vdcDAO;
-		this.objectCount = objectCount;
 	}
 	
-	public VdcBO(String mgmtAccessKey, String mgmtSecretKey, List<String> hosts, Integer port, Integer alternativePort, VdcDAO vdcDAO,
-			AtomicLong objectCount) {
+	public VdcBO(String mgmtAccessKey, String mgmtSecretKey, List<String> hosts, Integer port, Integer alternativePort, VdcDAO vdcDAO) {
 		// client config
 		ManagementClientConfig clientConfig = new VdcManagementClientConfig(mgmtAccessKey, mgmtSecretKey, port, alternativePort, hosts);
 		this.client = new VdcManagementClient(clientConfig);
 		this.vdcDAO = vdcDAO;
-		this.objectCount = objectCount;
 	}
 
-	public List<VdcDetails> collectVdcDetails(Date collectionTime) {
+	public List<VdcDetails> collectVdcDetails(Date collectionTime,AtomicLong objectCount) {
 		long objCounter = 0;
 		LOGGER.info("Collecting all VDC on cluster. ");
 		VdcDetails vdcDetails = client.getVdcDetails();
@@ -63,11 +58,11 @@ public class VdcBO {
 			vdcDAO.insert(vdcDetails, collectionTime);
 		}
 		// peg global counter
-		this.objectCount.getAndAdd(objCounter);
+		objectCount.getAndAdd(objCounter);
 		return vdcDetailsList;
 	}
 
-	public List<BucketOwner> collectBucketOwner(Date collectionTime) {
+	public List<BucketOwner> collectBucketOwner(Date collectionTime, AtomicLong objectCount) {
 		long objCounter = 0;
 		LOGGER.info("Collecting all bucket owner on cluster. ");
 		List<BucketOwner> bucketOwners = client.getBucketOwner();
@@ -80,7 +75,7 @@ public class VdcBO {
 			vdcDAO.insert(bucketOwners, collectionTime);
 		}
 		// peg global counter
-		this.objectCount.getAndAdd(objCounter);
+		objectCount.getAndAdd(objCounter);
 		return bucketOwners;
 	}
 

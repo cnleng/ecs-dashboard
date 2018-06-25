@@ -30,17 +30,13 @@ public class NamespaceBO {
 	private final static Logger LOGGER = Logger.getLogger(NamespaceBO.class);
 	private ManagementClient client;
 	private NamespaceDAO namespaceDAO;
-	private AtomicLong objectCount;
 
 	public NamespaceBO(String mgmtAccessKey, String mgmtSecretKey, List<String> hosts, Integer port,
-			NamespaceDAO namespaceDAO, AtomicLong objectCount) {
-
+			NamespaceDAO namespaceDAO) {
 		// client config
 		ManagementClientConfig clientConfig = new ManagementClientConfig(mgmtAccessKey, mgmtSecretKey, port, hosts);
-
 		this.client = new ManagementClient(clientConfig);
 		this.namespaceDAO = namespaceDAO;
-		this.objectCount = objectCount;
 	}
 
 	/**
@@ -74,7 +70,7 @@ public class NamespaceBO {
 	 * 
 	 * @return List - List of namespace details
 	 */
-	public List<NamespaceDetail> collectNamespaceDetails(Date collectionTime) {
+	public List<NamespaceDetail> collectNamespaceDetails(Date collectionTime, AtomicLong objectCount) {
 
 		// Start collecting namespace data details from ECS systems
 		List<Namespace> namespaceList = getNamespaces();
@@ -99,7 +95,7 @@ public class NamespaceBO {
 		}
 		
 		// peg global counter
-		this.objectCount.getAndAdd(objCounter);
+		objectCount.getAndAdd(objCounter);
 		return namespaceDetails;
 	}
 	
@@ -108,7 +104,7 @@ public class NamespaceBO {
 	 * 
 	 * @return List - List of namespace quota
 	 */
-	public List<NamespaceQuota> collectNamespaceQuota(Date collectionTime) {
+	public List<NamespaceQuota> collectNamespaceQuota(Date collectionTime, AtomicLong objectCount) {
 
 		// Start collecting namespace data quota from ECS systems
 		List<Namespace> namespaceList = getNamespaces();
@@ -137,7 +133,7 @@ public class NamespaceBO {
 		}
 
 		// peg global counter
-		this.objectCount.getAndAdd(objCounter);
+		objectCount.getAndAdd(objCounter);
 		return namespaceQuotas;
 	}
 

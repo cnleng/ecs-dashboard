@@ -5,7 +5,6 @@ package com.emc.ecs.metadata.controllers;
 
 import java.text.ParseException;
 
-import org.apache.log4j.Logger;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +21,6 @@ import com.emc.ecs.metadata.utils.Constants;
 @RequestMapping(value = Constants.URL_OBJECT)
 public class ObjectController {
 
-	private static final Logger LOG = Logger.getLogger(ObjectController.class);
 	private static final String OBJECT_DATAS = "/datas";
 	private static final String OBJECT_VERSIONS = "/versions";
 	private static final String OBJECT_MODIFIED = "/modified";
