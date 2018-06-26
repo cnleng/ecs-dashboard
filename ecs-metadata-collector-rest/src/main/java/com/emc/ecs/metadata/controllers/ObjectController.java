@@ -5,6 +5,7 @@ package com.emc.ecs.metadata.controllers;
 
 import java.text.ParseException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,6 +25,7 @@ public class ObjectController {
 	private static final String OBJECT_DATAS = "/datas";
 	private static final String OBJECT_VERSIONS = "/versions";
 	private static final String OBJECT_MODIFIED = "/modified";
+	@Autowired
 	private S3ObjectService s3ObjectService;
 
 	@RequestMapping(value = OBJECT_DATAS, method = RequestMethod.POST)

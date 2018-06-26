@@ -171,8 +171,6 @@ public class ManagementClient {
 				.append(namespaceRequest.getName())
 				.append(REST_BILLING_NAMESPACES_SECOND);
 		
-		System.out.println("getNamespaceBillingInfo rest request: " + restStr.toString());
-		
 		WebResource getNamespaceBillingResource;
 		
 		// get billing namespace Billing ressource
