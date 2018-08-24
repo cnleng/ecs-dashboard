@@ -91,18 +91,12 @@ public class ListObjectsVersionsCollection implements Callable<String> {
 		try{
 			// collect objects
 			ListVersionsResult listVersionsResult = collectionConfig.getS3JerseyClient().listVersions(listVersionsRequest);
-			
-			
-
 			long stopTime = System.currentTimeMillis();
 			Double elapsedTime = Double.valueOf(stopTime - startTime) / 1000;
 
 			if(listVersionsResult != null) {
-
 				Long collected = (long)listVersionsResult.getVersions().size();
-
 				this.collectionConfig.getObjectCount().getAndAdd(collected);
-
 				logger.info( "Took: " + elapsedTime + " seconds to collect " +
 						collected + " objects from namespace: " + 
 						collectionConfig.getNamespace() + " bucket: " + objectBucket.getName());
@@ -119,16 +113,12 @@ public class ListObjectsVersionsCollection implements Callable<String> {
 				while(listVersionsResult.isTruncated()) {
 
 					listVersionsRequest.setVersionIdMarker(listVersionsResult.getNextVersionIdMarker());
-
 					startTime = System.currentTimeMillis();
 					listVersionsResult = collectionConfig.getS3JerseyClient().listVersions(listVersionsRequest);
 					stopTime = System.currentTimeMillis();
-
 					elapsedTime = Double.valueOf(stopTime - startTime) / 1000;
-
 					collected = (long)listVersionsResult.getVersions().size();
 					collectionConfig.getObjectCount().getAndAdd(collected);
-
 					logger.info("Took: " + elapsedTime + " seconds to collect " +
 							collected + " objects versions from namespace: " + 
 							collectionConfig.getNamespace() + " bucket: " + objectBucket.getName());
@@ -156,15 +146,12 @@ public class ListObjectsVersionsCollection implements Callable<String> {
 	//=============================
 	private VersioningConfiguration.Status getBucketVersioningConfiguration() {
 		VersioningConfiguration versionConfig = collectionConfig.getS3JerseyClient().getBucketVersioning(objectBucket.getName());
-		
 		if(versionConfig != null && versionConfig.getStatus() != null) {
 			return versionConfig.getStatus();
 		} else {
-			// assume versioning is disaabled
+			// assume versioning is disabled
 			return VersioningConfiguration.Status.Suspended;
 		}
-		
-		
 	}
 	
 }

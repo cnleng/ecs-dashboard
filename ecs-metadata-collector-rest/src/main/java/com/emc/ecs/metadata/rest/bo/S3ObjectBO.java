@@ -3,7 +3,6 @@
  */
 package com.emc.ecs.metadata.rest.bo;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -35,39 +34,37 @@ public class S3ObjectBO {
 	private BillingBO billingBO;
 	private List<String> ecsObjectHosts;
 	private ObjectDAO objectDAO;
-	private ThreadPoolExecutor threadPoolExecutor;
-	private Queue<Future<?>> futures;
-	private AtomicLong objectCount;
+	private String namespace;
+	private String bucketname;
 
-	public S3ObjectBO(BillingBO billingBO, List<String> ecsObjectHosts, ObjectDAO objectDAO,
-			ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, AtomicLong objectCount) {
+	public S3ObjectBO(BillingBO billingBO, List<String> ecsObjectHosts, ObjectDAO objectDAO) {
 		this.billingBO = billingBO;
 		this.ecsObjectHosts = ecsObjectHosts;
-		this.threadPoolExecutor = threadPoolExecutor;
-		this.futures = futures;
 		this.objectDAO = objectDAO;
-		this.objectCount = objectCount;
 	}
 
-	public ThreadPoolExecutor getThreadPool() {
-		return threadPoolExecutor;
+	public S3ObjectBO(BillingBO billingBO, List<String> ecsObjectHosts, ObjectDAO objectDAO, String namespace) {
+		this(billingBO, ecsObjectHosts, objectDAO);
+		this.namespace = namespace;
+	}
+	
+	public S3ObjectBO(BillingBO billingBO, List<String> ecsObjectHosts, ObjectDAO objectDAO, String namespace, String bucketname) {
+		this(billingBO, ecsObjectHosts, objectDAO);
+		this.namespace = namespace;
+		this.bucketname = bucketname;
+	}
+	
+	public void collectObjectData(Date collectionTime,ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures,AtomicLong objectCount) {
+		collectObjectData(collectionTime, threadPoolExecutor, futures, null, objectCount);
 	}
 
-	public Collection<Future<?>> getFutures() {
-		return futures;
-	}
-
-	public void collectObjectData(Date collectionTime) {
-		collectObjectData(collectionTime, null);
-	}
-
-	public void collectObjectData(Date collectionTime, String queryCriteria) {
+	public void collectObjectData(Date collectionTime, ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, String queryCriteria, AtomicLong objectCount) {
 
 		// collect S3 user Id and credentials
 		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
 		// Collect bucket details
 		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
-		billingBO.getObjectBucketData(objectBucketMap, this.objectCount);
+		billingBO.getObjectBucketData(objectBucketMap, objectCount);
 		Map<String, S3JerseyClient> s3ObjectClientMap = null;
 
 		try {
@@ -120,14 +117,14 @@ public class S3ObjectBO {
 
 	}
 
-	public void collectObjectVersionData(Date collectionTime) {
+	public void collectObjectVersionData(Date collectionTime, ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, AtomicLong objectCount) {
 
 		// collect S3 user Id and credentials
 		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
 
 		// Collect bucket details
 		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
-		billingBO.getObjectBucketData(objectBucketMap, this.objectCount);
+		billingBO.getObjectBucketData(objectBucketMap, objectCount);
 		Map<String, S3JerseyClient> s3ObjectClientMap = null;
 
 		try {
@@ -211,6 +208,138 @@ public class S3ObjectBO {
 		} // wait for poll to complete
 
 		return s3JerseyClientList;
+	}
+	
+	/**
+	 * 
+	 * @param collectionTime
+	 * @param namespace
+	 * @param threadPoolExecutor
+	 * @param futures
+	 * @param objectCount
+	 */
+	public void collectObjectDataByNamespace(Date collectionTime, ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, AtomicLong objectCount) {
+		
+		// collect S3 user Id and credentials
+		// Collect bucket details
+		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
+		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
+		billingBO.getObjectBucketDataByNamespace(objectBucketMap, this.namespace, objectCount);
+		Map<String, S3JerseyClient> s3ObjectClientMap = null;
+		
+		try {
+			// create all required S3 jersey clients for very S3 users
+			s3ObjectClientMap = createS3ObjectClients(objectUserDetailsList, this.ecsObjectHosts);
+			
+			// collect objects for all users
+			for( ObjectUserDetails objectUserDetails : objectUserDetailsList ) {
+
+				if (objectUserDetails.getObjectUser().getUserId() == null
+						|| objectUserDetails.getSecretKeys().getSecretKey1() == null
+						|| objectUserDetails.getObjectUser().getNamespace() == null
+						|| !this.namespace.equals(objectUserDetails.getObjectUser().getNamespace().toString())) {
+					continue;
+				}
+
+				String userId = objectUserDetails.getObjectUser().getUserId().toString();
+				S3JerseyClient s3JerseyClient = s3ObjectClientMap.get(userId);
+
+				if (s3JerseyClient != null) {
+
+					ObjectCollectionConfig collectionConfig = new ObjectCollectionConfig(s3JerseyClient, this.namespace,
+							this.objectDAO, objectBucketMap, collectionTime, objectCount, threadPoolExecutor, futures,
+							null);
+					NamespaceObjectCollection namespaceObjectCollection = new NamespaceObjectCollection(
+							collectionConfig);
+
+					try {
+						// submit namespace collection to thread pool
+						futures.add(threadPoolExecutor.submit(namespaceObjectCollection));
+					} catch (RejectedExecutionException e) {
+						// Thread pool didn't accept bucket collection
+						// running in the current thread
+						LOGGER.error("Thread pool didn't accept bucket collection - running in current thread");
+						try {
+							namespaceObjectCollection.call();
+						} catch (Exception e1) {
+							LOGGER.error("Error occured during namespace object collection operation - message: "
+									+ e.getLocalizedMessage());
+						}
+					}
+				}
+			}
+			
+		} finally {
+			// ensure to clean up S3 jersey clients
+			if(s3ObjectClientMap != null ) {
+				for( S3JerseyClient s3JerseyClient : s3ObjectClientMap.values() ) {
+					s3JerseyClient.destroy();
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param collectionTime
+	 * @param threadPoolExecutor
+	 * @param futures
+	 * @param objectCount
+	 */
+	public void collectObjectDataByBucket(Date collectionTime, ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, AtomicLong objectCount) {
+		// collect S3 user Id and credentials
+		List<ObjectUserDetails> objectUserDetailsList = billingBO.getObjectUserSecretKeys();
+		
+		// Collect bucket details
+		Map<NamespaceBucketKey, ObjectBucket> objectBucketMap = new HashMap<>();
+		billingBO.getObjectBucketDataByBucket(objectBucketMap, this.namespace, this.bucketname, objectCount);
+		Map<String, S3JerseyClient> s3ObjectClientMap = null;
+		
+		try {
+			// create all required S3 jersey clients for very S3 users
+			s3ObjectClientMap = createS3ObjectClients(objectUserDetailsList, this.ecsObjectHosts);
+			
+			// collect objects for all users
+			for( ObjectUserDetails objectUserDetails : objectUserDetailsList ) {
+
+				if (objectUserDetails.getObjectUser().getUserId() == null
+						|| objectUserDetails.getSecretKeys().getSecretKey1() == null
+						|| objectUserDetails.getObjectUser().getNamespace() == null
+						|| !namespace.equals(objectUserDetails.getObjectUser().getNamespace().toString())) {
+					continue;
+				}
+
+				String userId = objectUserDetails.getObjectUser().getUserId().toString();
+				S3JerseyClient s3JerseyClient = s3ObjectClientMap.get(userId);
+
+				if (s3JerseyClient != null) {
+
+					ObjectCollectionConfig collectionConfig = new ObjectCollectionConfig(s3JerseyClient, this.namespace, this.bucketname,
+							this.objectDAO, objectBucketMap, collectionTime, objectCount, threadPoolExecutor, futures, null);
+					NamespaceObjectCollection namespaceObjectCollection = new NamespaceObjectCollection(
+							collectionConfig);
+					try {
+						// submit namespace collection to thread pool
+						futures.add(threadPoolExecutor.submit(namespaceObjectCollection));
+					} catch (RejectedExecutionException e) {
+						LOGGER.error("Thread pool didn't accept bucket collection - running in current thread");
+						try {
+							namespaceObjectCollection.call();
+						} catch (Exception e1) {
+							LOGGER.error("Error occured during namespace object collection operation - message: "
+									+ e.getLocalizedMessage());
+						}
+					}
+				}
+			}
+		} finally {
+			// ensure to clean up S3 jersey clients
+			if(s3ObjectClientMap != null ) {
+				for( S3JerseyClient s3JerseyClient : s3ObjectClientMap.values() ) {
+					s3JerseyClient.destroy();
+				}
+			}
+		}
 	}
 
 	public void shutdown() {

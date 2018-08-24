@@ -108,7 +108,4 @@ public class NamespaceObjectVersionCollection implements Callable<String> {
 		}
 	}
 
-
-
-
 }

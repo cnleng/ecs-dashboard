@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.emc.ecs.metadata.services.impl;
+package com.emc.ecs.metadata.services.snow;
 
 import java.util.Date;
 
@@ -11,20 +11,20 @@ import org.springframework.stereotype.Service;
 
 import com.emc.ecs.metadata.configuration.EcsConfiguration;
 import com.emc.ecs.metadata.configuration.ServiceNowConfiguration;
-import com.emc.ecs.metadata.dao.BillingDAO;
-import com.emc.ecs.metadata.dao.servicenow.ServiceNowBillingDAO;
+import com.emc.ecs.metadata.dao.VdcDAO;
 import com.emc.ecs.metadata.dao.servicenow.ServiceNowDAOConfig;
-import com.emc.ecs.metadata.rest.bo.BillingBO;
-import com.emc.ecs.metadata.services.BillingService;
-import com.emc.ecs.metadata.tasks.BillingTask;
+import com.emc.ecs.metadata.dao.servicenow.ServiceNowVdcDAO;
+import com.emc.ecs.metadata.rest.bo.VdcBO;
+import com.emc.ecs.metadata.services.VdcService;
+import com.emc.ecs.metadata.tasks.VdcTask;
 import com.emc.ecs.metadata.utils.Constants.TaskType;
 
 /**
  * @author nlengc
  *
  */
-@Service
-public class BillingServiceImpl implements BillingService {
+@Service("servicenowVdcService")
+public class ServicenowVdcService implements VdcService {
 	
 	@Autowired
 	private ServiceNowConfiguration serviceNowConfiguration;
@@ -34,8 +34,8 @@ public class BillingServiceImpl implements BillingService {
 	private TaskExecutor ecsPoolTaskExecutor;
 
 	@Override
-	public void postNamespaceBillingInfo(Date collectionTime) {
-		BillingDAO billingDAO = null;
+	public void postVdcDetails(Date collectionTime) {
+		VdcDAO vdcDAO = null;
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
@@ -43,19 +43,20 @@ public class BillingServiceImpl implements BillingService {
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
-		billingDAO = new ServiceNowBillingDAO(serviceNowDAOConfig);
+		vdcDAO = new ServiceNowVdcDAO(serviceNowDAOConfig);
 
-		// instantiate billing BO
-		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO);
+		// instantiate BO
+		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), vdcDAO);
 
-		BillingTask billingTask = new BillingTask(collectionTime, billingBO, TaskType.NamespaceBillingInfos);
-		ecsPoolTaskExecutor.execute(billingTask);
+		// Start collection
+		VdcTask vdcTask = new VdcTask(collectionTime, vdcBO, TaskType.VdcDetails);
+		ecsPoolTaskExecutor.execute(vdcTask);
 	}
 
 	@Override
-	public void postObjectBuckets(Date collectionTime) {
-		BillingDAO billingDAO = null;
+	public void postBucketOwners(Date collectionTime) {
+		VdcDAO vdcDAO = null;
 		// Instantiate ServiceNow
 		final ServiceNowDAOConfig serviceNowDAOConfig = new ServiceNowDAOConfig();
 		serviceNowDAOConfig.setInstanceUrl(serviceNowConfiguration.getInstanceUrl());
@@ -63,15 +64,15 @@ public class BillingServiceImpl implements BillingService {
 		serviceNowDAOConfig.setUsername(serviceNowConfiguration.getUsername());
 		serviceNowDAOConfig.setPassword(serviceNowConfiguration.getPassword());
 		serviceNowDAOConfig.setCollectionTime(collectionTime);
-		billingDAO = new ServiceNowBillingDAO(serviceNowDAOConfig);
+		vdcDAO = new ServiceNowVdcDAO(serviceNowDAOConfig);
 
-		// instantiate billing BO
-		BillingBO billingBO = new BillingBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
-				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), billingDAO);
+		// instantiate BO
+		VdcBO vdcBO = new VdcBO(ecsConfiguration.getEcsMgmtAccessKey(), ecsConfiguration.getEcsMgmtSecretKey(),
+				ecsConfiguration.getEcsHosts(), ecsConfiguration.getEcsMgmtPort(), ecsConfiguration.getEcsAlternativePort(), vdcDAO);
 
 		// Start collection
-		BillingTask billingTask = new BillingTask(collectionTime, billingBO, TaskType.ObjectBuckets);
-		ecsPoolTaskExecutor.execute(billingTask);
+		VdcTask vdcTask = new VdcTask(collectionTime, vdcBO, TaskType.BucketOwners);
+		ecsPoolTaskExecutor.execute(vdcTask);
 	}
 
 }

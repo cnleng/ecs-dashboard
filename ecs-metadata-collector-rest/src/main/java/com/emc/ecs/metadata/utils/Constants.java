@@ -23,6 +23,10 @@ import com.emc.ecs.management.entity.Vdc;
  */
 public class Constants {
 
+	// Target
+	public static final String MQTT = "/mqtt";
+	public static final String SNOW = "/snow";
+	
 	// REST End Points
 	public static final String URL_NAMESPACE = "/namespaces";
 	public static final String URL_BILLING = "/billings";
@@ -35,7 +39,7 @@ public class Constants {
 	public static final SimpleDateFormat DATA_DATE_FORMAT = new SimpleDateFormat(DATA_DATE_PATTERN);
 	
 	public enum TaskType {
-		NamespaceDetails, NamespaceQuotas, NamespaceBillingInfos, ObjectBuckets, VdcDetails, BucketOwners, S3ObjectVersions, S3ObjectsData, S3ObjectsModified
+		NamespaceDetails, NamespaceQuotas, NamespaceBillingInfos, ObjectBuckets, VdcDetails, BucketOwners, S3ObjectVersions, S3ObjectsData, S3ObjectsModified, S3ObjectsDataByNamespace, S3ObjectsDataByBucket
 	}
 
 	/**

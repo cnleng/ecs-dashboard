@@ -1,10 +1,11 @@
 /**
  * 
  */
-package com.emc.ecs.metadata.controllers;
+package com.emc.ecs.metadata.controllers.snow;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +27,7 @@ public class BillingController {
 	private static final String OBJECT_BUCKETS = "/objectBuckets";
 
 	@Autowired
+	@Qualifier("servicenowBillingService")
 	private BillingService billingService;
 
 	@RequestMapping(value = NAMESPACE_BILLING_INFOS, method = RequestMethod.POST)

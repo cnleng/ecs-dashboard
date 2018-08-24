@@ -1,10 +1,11 @@
 /**
  * 
  */
-package com.emc.ecs.metadata.controllers;
+package com.emc.ecs.metadata.controllers.snow;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,6 +27,7 @@ public class NamespaceController {
 	private static final String NAMESPACE_QUOTAS = "/quotas";
 	
 	@Autowired
+	@Qualifier("servicenowNamespaceService")
 	private NamespaceService namespaceService;
 	
 	@RequestMapping(value = NAMESPACE_DETAILS, method = RequestMethod.POST)

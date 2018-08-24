@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import com.emc.ecs.management.client.ManagementClient;
 import com.emc.ecs.management.client.ManagementClientConfig;
 import com.emc.ecs.management.entity.BucketBillingInfo;
+import com.emc.ecs.management.entity.BucketRequest;
 import com.emc.ecs.management.entity.ListNamespaceRequest;
 import com.emc.ecs.management.entity.ListNamespacesResult;
 import com.emc.ecs.management.entity.Namespace;
@@ -381,5 +382,207 @@ public class BillingBO {
 		}
 
 		return namespaceList;
+	}
+	
+	public void getObjectBucketDataByNamespace(Map<NamespaceBucketKey, ObjectBucket> objectBucketMap, String namespace, AtomicLong objectCount) {
+		collectObjectBucketDataByNamespace(null, objectBucketMap, null, null, namespace, objectCount);
+	}
+	
+	/**
+	 * 
+	 * @param objectPerNamespaceMap
+	 * @param objectBucketMap
+	 * @param collectionTime
+	 * @param billDAO
+	 * @param namespace
+	 */
+	private void collectObjectBucketDataByNamespace(Map<String, Set<ObjectBucket>> objectPerNamespaceMap,
+			Map<NamespaceBucketKey, ObjectBucket> objectBucketMap, Date collectionTime, BillingDAO billDAO,
+			String namespace, AtomicLong objectCount) {
+		
+		long objCounter = 0;
+		NamespaceRequest namespaceRequest = new NamespaceRequest();
+		namespaceRequest.setName(namespace);
+		ObjectBuckets objectBucketsResponse = client.getNamespaceBucketInfo(namespaceRequest);
+
+		if (objectBucketsResponse == null) {
+			return;
+		}
+
+		LOGGER.info("Collect Billing Data for namespace: " + namespace);
+		objCounter += (objectBucketsResponse.getObjectBucket() != null) ? objectBucketsResponse.getObjectBucket().size() : 0;
+
+		// Push collected info into datastore
+		if (billDAO != null) {
+			billDAO.insert(objectBucketsResponse, collectionTime);
+		}
+
+		// Add to return map per namespace and bucket key
+		if (objectBucketsResponse.getObjectBucket() != null && objectBucketMap != null) {
+			for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+				NamespaceBucketKey key = new NamespaceBucketKey(namespace, objectBucket.getName());
+				objectBucketMap.put(key, objectBucket);
+			}
+		}
+
+		// Add to return map per namespace key
+		if (objectBucketsResponse.getObjectBucket() != null && objectPerNamespaceMap != null) {
+			Set<ObjectBucket> objectSet = objectPerNamespaceMap.get(namespace);
+			if (objectSet == null) {
+				// there isn;t already a set present for that namespace
+				// create one
+				objectSet = new HashSet<ObjectBucket>();
+				objectPerNamespaceMap.put(namespace, objectSet);
+			}
+
+			for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+				// add all object to set
+				objectSet.add(objectBucket);
+			}
+		}
+
+		// collect n subsequent pages
+		while (namespaceRequest.getNextMarker() != null) {
+			objectBucketsResponse = client.getNamespaceBucketInfo(namespaceRequest);
+			if (objectBucketsResponse != null) {
+				objCounter += (objectBucketsResponse.getObjectBucket() != null)
+						? objectBucketsResponse.getObjectBucket().size() : 0;
+				namespaceRequest.setNextMarker(objectBucketsResponse.getNextMarker());
+
+				// Push collected info into datastore
+				if (billDAO != null) {
+					billDAO.insert(objectBucketsResponse, collectionTime);
+				}
+
+				// Add to return map
+				if (objectBucketsResponse.getObjectBucket() != null && objectBucketMap != null) {
+					for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+						NamespaceBucketKey key = new NamespaceBucketKey(namespace, objectBucket.getName());
+						objectBucketMap.put(key, objectBucket);
+					}
+				}
+
+				// Add to return map per namespace key
+				if (objectBucketsResponse.getObjectBucket() != null && objectPerNamespaceMap != null) {
+					Set<ObjectBucket> objectSet = objectPerNamespaceMap.get(namespace);
+					if (objectSet == null) {
+						// there isn;t already a set present for that namespace
+						// create one
+						objectSet = new HashSet<ObjectBucket>();
+						// add reference of set to map
+						objectPerNamespaceMap.put(namespace, objectSet);
+					}
+
+					for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+						// add all object to set
+						objectSet.add(objectBucket);
+					}
+				}
+
+			} else {
+				// stop the loop
+				namespaceRequest.setNextMarker(null);
+			}
+		}
+		// peg global counter
+		 objectCount.getAndAdd(objCounter);
+	}
+	
+/**
+ * 
+ * @param objectBucketMap
+ * @param namespace
+ * @param bucketname
+ * @param objectCount
+ */
+	public void getObjectBucketDataByBucket(Map<NamespaceBucketKey, ObjectBucket> objectBucketMap, String namespace, String bucketname, AtomicLong objectCount) {
+		collectObjectBucketDataByBucket(null, objectBucketMap, null, null, namespace, bucketname, objectCount);
+	}
+	
+	private void collectObjectBucketDataByBucket(Map<String, Set<ObjectBucket>> objectPerNamespaceMap,
+			Map<NamespaceBucketKey, ObjectBucket> objectBucketMap, Date collectionTime, BillingDAO billDAO,
+			String namespace, String bucketname, AtomicLong objectCount) {
+		long objCounter = 0;
+		BucketRequest bucketRequest = new BucketRequest();
+		bucketRequest.setName(bucketname);
+		bucketRequest.setNamespace(namespace);
+		ObjectBuckets objectBucketsResponse = client.getBucketInfo(bucketRequest);
+
+		if (objectBucketsResponse == null) {
+			return;
+		}
+
+		LOGGER.info("Collect Billing Data for namespace: " + namespace + " and bucket: "+ bucketname);
+		objCounter += (objectBucketsResponse.getObjectBucket() != null) ? objectBucketsResponse.getObjectBucket().size()
+				: 0;
+
+		// Push collected info into datastore
+		if (billDAO != null) {
+			billDAO.insert(objectBucketsResponse, collectionTime);
+		}
+
+		// Add to return map per namespace and bucket key
+		if (objectBucketsResponse.getObjectBucket() != null && objectBucketMap != null) {
+			for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+				NamespaceBucketKey key = new NamespaceBucketKey(namespace, objectBucket.getName());
+				objectBucketMap.put(key, objectBucket);
+			}
+		}
+
+		// Add to return map per namespace key
+		if (objectBucketsResponse.getObjectBucket() != null && objectPerNamespaceMap != null) {
+			Set<ObjectBucket> objectSet = objectPerNamespaceMap.get(namespace);
+			if (objectSet == null) {
+				// there isn;t already a set present for that namespace
+				objectSet = new HashSet<ObjectBucket>();
+				objectPerNamespaceMap.put(namespace, objectSet);
+			}
+
+			for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+				objectSet.add(objectBucket);
+			}
+		}
+
+		// collect n subsequent pages
+		while (bucketRequest.getNextMarker() != null) {
+			objectBucketsResponse = client.getBucketInfo(bucketRequest);
+			if (objectBucketsResponse != null) {
+				objCounter += (objectBucketsResponse.getObjectBucket() != null)
+						? objectBucketsResponse.getObjectBucket().size() : 0;
+						bucketRequest.setNextMarker(objectBucketsResponse.getNextMarker());
+
+				// Push collected info into datastore
+				if (billDAO != null) {
+					billDAO.insert(objectBucketsResponse, collectionTime);
+				}
+
+				// Add to return map
+				if (objectBucketsResponse.getObjectBucket() != null && objectBucketMap != null) {
+					for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+							NamespaceBucketKey key = new NamespaceBucketKey(namespace, objectBucket.getName());
+							objectBucketMap.put(key, objectBucket);
+					}
+				}
+
+				// Add to return map per namespace key
+				if (objectBucketsResponse.getObjectBucket() != null && objectPerNamespaceMap != null) {
+					Set<ObjectBucket> objectSet = objectPerNamespaceMap.get(namespace);
+					if (objectSet == null) {
+						objectSet = new HashSet<ObjectBucket>();
+						objectPerNamespaceMap.put(namespace, objectSet);
+					}
+
+					for (ObjectBucket objectBucket : objectBucketsResponse.getObjectBucket()) {
+						objectSet.add(objectBucket);
+					}
+				}
+
+			} else {
+				// stop the loop
+				bucketRequest.setNextMarker(null);
+			}
+		}
+		// peg global counter
+		objectCount.getAndAdd(objCounter);
 	}
 }

@@ -43,6 +43,7 @@ public class ObjectCollectionConfig {
 	// Private members
 	//========================
 	private String                                namespace;
+	private String                                bucketname;
 	private S3JerseyClient                        s3JerseyClient;
 	private ObjectDAO                             objectDAO;
 	private Date                                  collectionTime;
@@ -52,9 +53,6 @@ public class ObjectCollectionConfig {
 	private Queue<Future<?>>     				  futures;
 	private String 								  queryCriteria;
 	
-	
-
-
 
 
 	public ObjectCollectionConfig( S3JerseyClient                        s3JerseyClient, 
@@ -78,10 +76,25 @@ public class ObjectCollectionConfig {
 		this.queryCriteria      = queryCriteria;
 	}
 	
+	public ObjectCollectionConfig(S3JerseyClient s3JerseyClient, String namespace, String bucketname,
+			ObjectDAO objectDAO, Map<NamespaceBucketKey, ObjectBucket> bucketMap, Date collectionTime,
+			AtomicLong objectCount, ThreadPoolExecutor threadPoolExecutor, Queue<Future<?>> futures, String queryCriteria) {
+		this.s3JerseyClient     = s3JerseyClient;
+		this.namespace          = namespace;
+		this.bucketname         = bucketname;
+		this.bucketMap          = bucketMap;
+		this.objectDAO          = objectDAO;
+		this.collectionTime     = collectionTime;
+		this.objectCount        = objectCount;
+		this.threadPoolExecutor = threadPoolExecutor;
+		this.futures            = futures;
+		this.queryCriteria      = queryCriteria;
+	}
+	
 	//=======================
 	// Public methods
 	//=======================
-	
+
 	public ThreadPoolExecutor getThreadPoolExecutor() {
 		return threadPoolExecutor;
 	}
@@ -106,7 +119,14 @@ public class ObjectCollectionConfig {
 	public void setNamespace(String namespace) {
 		this.namespace = namespace;
 	}
+	
+	public final String getBucketname() {
+		return bucketname;
+	}
 
+	public final void setBucketname(String bucketname) {
+		this.bucketname = bucketname;
+	}
 
 	public S3JerseyClient getS3JerseyClient() {
 		return s3JerseyClient;

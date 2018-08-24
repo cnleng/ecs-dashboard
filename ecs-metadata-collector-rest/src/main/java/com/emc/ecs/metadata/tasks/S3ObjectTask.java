@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
-import com.emc.ecs.metadata.rest.bo.S3ObjectBOV2;
+import com.emc.ecs.metadata.rest.bo.S3ObjectBO;
 import com.emc.ecs.metadata.utils.Constants.TaskType;
 
 /**
@@ -35,22 +35,22 @@ public class S3ObjectTask implements Runnable {
 	private Queue<Future<?>> futures = new ConcurrentLinkedQueue<Future<?>>();
 
 	private Date collectionTime;
-	private S3ObjectBOV2 objectBO;
+	private S3ObjectBO objectBO;
 	private TaskType taskType;
 	private Integer numberOfDays;
 	private AtomicLong objectCount = new AtomicLong(0L);
 
-	public S3ObjectTask(Date collectionTime, S3ObjectBOV2 objectBO, TaskType taskType) {
+	public S3ObjectTask(Date collectionTime, S3ObjectBO objectBO, TaskType taskType) {
 		this.collectionTime = collectionTime;
 		this.objectBO = objectBO;
 		this.taskType = taskType;
 	}
 
-	public S3ObjectTask(Date collectionTime, S3ObjectBOV2 objectBO, TaskType taskType, Integer numberOfDays) {
+	public S3ObjectTask(Date collectionTime, S3ObjectBO objectBO, TaskType taskType, Integer numberOfDays) {
 		this(collectionTime, objectBO, taskType);
 		this.numberOfDays = numberOfDays;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -63,6 +63,12 @@ public class S3ObjectTask implements Runnable {
 			case S3ObjectsData:
 				objectBO.collectObjectData(this.collectionTime, threadPoolExecutor, futures, objectCount);
 				break;
+			case S3ObjectsDataByNamespace:
+				objectBO.collectObjectDataByNamespace(this.collectionTime, threadPoolExecutor, futures, objectCount);
+				break;
+			case S3ObjectsDataByBucket:
+				objectBO.collectObjectDataByBucket(this.collectionTime, threadPoolExecutor, futures, objectCount);
+				break;				
 			case S3ObjectVersions:
 				objectBO.collectObjectVersionData(this.collectionTime, threadPoolExecutor, futures, objectCount);
 				break;

@@ -1,11 +1,12 @@
 /**
  * 
  */
-package com.emc.ecs.metadata.controllers;
+package com.emc.ecs.metadata.controllers.mqtt;
 
 import java.text.ParseException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,19 +20,32 @@ import com.emc.ecs.metadata.utils.Constants;
  *
  */
 @RestController
-@RequestMapping(value = Constants.URL_OBJECT)
+@RequestMapping(value = Constants.MQTT + Constants.URL_OBJECT)
 public class ObjectController {
 
 	private static final String OBJECT_DATAS = "/datas";
 	private static final String OBJECT_VERSIONS = "/versions";
 	private static final String OBJECT_MODIFIED = "/modified";
+
 	@Autowired
+	@Qualifier("mqttS3ObjectService")
 	private S3ObjectService s3ObjectService;
 
 	@RequestMapping(value = OBJECT_DATAS, method = RequestMethod.POST)
-	public void postObjectData(@RequestParam(value = "relativeDayShift", required = false) Integer relativeDayShift)
+	public void postObjectData(@RequestParam(value = "relativeDayShift", required = false) Integer relativeDayShift,
+			@RequestParam(value = "namespace", required = false) String namespace,
+			@RequestParam(value = "bucket", required = false) String bucket)
 			throws ParseException {
-		s3ObjectService.postObjectData(Constants.getCollectionTime(relativeDayShift));
+		if (namespace != null) {
+			if (bucket != null) {
+				s3ObjectService.postObjectDataByBucket(Constants.getCollectionTime(relativeDayShift), namespace,
+						bucket);
+			} else {
+				s3ObjectService.postObjectDataByNamespace(Constants.getCollectionTime(relativeDayShift), namespace);
+			}
+		} else {
+			s3ObjectService.postObjectData(Constants.getCollectionTime(relativeDayShift));
+		}
 	}
 
 	@RequestMapping(value = OBJECT_VERSIONS, method = RequestMethod.POST)
@@ -44,4 +58,5 @@ public class ObjectController {
 	public void postObjectModified(@RequestParam(value = "numberOfDays", required = true) Integer numberOfDays) throws ParseException {
 		s3ObjectService.postObjectModified(Constants.getCollectionTime(null), numberOfDays);
 	}
+	
 }

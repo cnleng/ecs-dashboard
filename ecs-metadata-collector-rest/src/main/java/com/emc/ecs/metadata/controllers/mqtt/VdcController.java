@@ -1,10 +1,11 @@
 /**
  * 
  */
-package com.emc.ecs.metadata.controllers;
+package com.emc.ecs.metadata.controllers.mqtt;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +19,7 @@ import com.emc.ecs.metadata.utils.Constants;
  *
  */
 @RestController
-@RequestMapping(value = Constants.URL_VDC)
+@RequestMapping(value = Constants.MQTT + Constants.URL_VDC)
 public class VdcController {
 	
 	private static final Logger LOG = Logger.getLogger(VdcController.class);
@@ -26,6 +27,7 @@ public class VdcController {
 	private static final String BUCKET_OWNERS = "/bucketOwners";
 
 	@Autowired
+	@Qualifier("mqttVdcService")
 	private VdcService vdcService;
 
 	@RequestMapping(value = VDC_DETAILS, method = RequestMethod.POST)

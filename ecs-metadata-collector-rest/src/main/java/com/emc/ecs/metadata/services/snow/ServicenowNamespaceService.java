@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.emc.ecs.metadata.services.impl;
+package com.emc.ecs.metadata.services.snow;
 
 import java.util.Date;
 
@@ -23,8 +23,8 @@ import com.emc.ecs.metadata.utils.Constants.TaskType;
  * @author nlengc
  *
  */
-@Service
-public class NamespaceServiceImpl implements NamespaceService {
+@Service("servicenowNamespaceService")
+public class ServicenowNamespaceService implements NamespaceService {
 
 	@Autowired
 	private ServiceNowConfiguration serviceNowConfiguration;
