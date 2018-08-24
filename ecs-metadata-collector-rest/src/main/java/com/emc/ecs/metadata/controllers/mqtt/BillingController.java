@@ -23,8 +23,8 @@ import com.emc.ecs.metadata.utils.Constants;
 public class BillingController {
 
 	private static final Logger LOG = Logger.getLogger(BillingController.class);
-	private static final String NAMESPACE_BILLING_INFOS = "/ecs_billing_infos";
-	private static final String OBJECT_BUCKETS = "/ecs_object_buckets";
+	private static final String NAMESPACE_BILLING_INFOS = "/billinginfos";
+	private static final String OBJECT_BUCKETS = "/objectbuckets";
 
 	@Autowired
 	@Qualifier("mqttBillingService")

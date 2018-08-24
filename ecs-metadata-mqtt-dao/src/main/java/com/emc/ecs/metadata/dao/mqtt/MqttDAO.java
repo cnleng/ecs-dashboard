@@ -6,7 +6,9 @@ package com.emc.ecs.metadata.dao.mqtt;
 import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
+import org.fusesource.mqtt.client.BlockingConnection;
 import org.fusesource.mqtt.client.MQTT;
+import org.fusesource.mqtt.client.QoS;
 
 /**
  * @author nlengc
@@ -31,9 +33,11 @@ public abstract class MqttDAO {
 	 * @param endPoint
 	 * @param json
 	 */
-	protected void postData(final String endPoint, final String json) {
+	protected void postData(final String topic, final String json) {
 		try {
-			//
+			final BlockingConnection connection = this.mqtt.blockingConnection();
+			connection.connect();
+			connection.publish(topic, json.getBytes(), QoS.AT_LEAST_ONCE, false);
 		} catch (Exception e) {
 			LOG.error("An error occured while posting data to service-now instance: ", e);
 		}
