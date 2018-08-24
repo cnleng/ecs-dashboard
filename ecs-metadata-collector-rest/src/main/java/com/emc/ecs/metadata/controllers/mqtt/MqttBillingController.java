@@ -20,9 +20,9 @@ import com.emc.ecs.metadata.utils.Constants;
  */
 @RestController
 @RequestMapping(value = Constants.MQTT + Constants.URL_BILLING)
-public class BillingController {
+public class MqttBillingController {
 
-	private static final Logger LOG = Logger.getLogger(BillingController.class);
+	private static final Logger LOG = Logger.getLogger(MqttBillingController.class);
 	private static final String NAMESPACE_BILLING_INFOS = "/billinginfos";
 	private static final String OBJECT_BUCKETS = "/objectbuckets";
 

@@ -779,6 +779,10 @@ public class ElasticBillingDAO implements BillingDAO {
 
 		return builder;
 	}
+	
+	@Override
+	public void close() {
+	}
 
 	
 }

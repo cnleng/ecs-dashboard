@@ -117,4 +117,9 @@ public class MqttNamespaceDAO extends MqttDAO implements NamespaceDAO {
 		jsonMap.put("collectiontime", collectionTime);
 		return mapper.writeValueAsString(jsonMap);
 	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+	}
 }

@@ -73,4 +73,9 @@ public interface BillingDAO {
 	 * @return Long
 	 */
 	public Long purgeOldData( ManagementDataType type, Date collectionTime);
+	
+	/**
+	 * 
+	 */
+	public void close();
 }

@@ -149,4 +149,8 @@ public class MqttVdcDAO extends MqttDAO implements VdcDAO {
 		}
 		return mapper.writeValueAsString(jsonMap);
 	}
+	
+	@Override
+	public void close() {
+	}
 }

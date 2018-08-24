@@ -17,9 +17,9 @@ import org.fusesource.mqtt.client.QoS;
 public abstract class MqttDAO {
 	
 	private static final Logger LOG = Logger.getLogger(MqttDAO.class);
-	protected MQTT mqtt;
-	protected String host;
-	protected int port;
+	protected final MQTT mqtt;
+	protected final String host;
+	protected final int port;
 	
 	public MqttDAO(MqttDAOConfig config) throws URISyntaxException {
 		this.host = config.getHost();
@@ -34,12 +34,22 @@ public abstract class MqttDAO {
 	 * @param json
 	 */
 	protected void postData(final String topic, final String json) {
+		BlockingConnection connection = null;
 		try {
-			final BlockingConnection connection = this.mqtt.blockingConnection();
+			connection = this.mqtt.blockingConnection();
 			connection.connect();
 			connection.publish(topic, json.getBytes(), QoS.AT_LEAST_ONCE, false);
 		} catch (Exception e) {
-			LOG.error("An error occured while posting data to service-now instance: ", e);
+			LOG.error("An error occured while posting data to MQTT Broker: ", e);
+		} finally {
+			if (connection!=null) {
+				try {
+					connection.disconnect();
+				} catch (Exception e) {
+					LOG.error("An error occured while closing MQTT connection: ", e);
+				}
+			}
 		}
 	}
+	
 }

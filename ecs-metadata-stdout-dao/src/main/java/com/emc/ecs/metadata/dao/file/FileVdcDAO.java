@@ -89,8 +89,11 @@ public class FileVdcDAO implements VdcDAO {
 
 	@Override
 	public Long purgeOldData(VdcDataType type, Date thresholdDate) {
-		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	@Override
+	public void close() {
 	}
 
 }

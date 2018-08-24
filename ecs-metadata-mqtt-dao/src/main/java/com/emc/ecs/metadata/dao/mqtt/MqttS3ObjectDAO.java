@@ -209,4 +209,8 @@ public class MqttS3ObjectDAO extends MqttDAO implements ObjectDAO {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void close() {
+	}
 }

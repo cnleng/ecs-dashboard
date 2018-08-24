@@ -142,7 +142,7 @@ public class NamespaceBO {
 			client.shutdown();
 		}
 		if (namespaceDAO!=null) {
-			((ServiceNowDAO)namespaceDAO).close();
+			namespaceDAO.close();
 		}
 	}
 

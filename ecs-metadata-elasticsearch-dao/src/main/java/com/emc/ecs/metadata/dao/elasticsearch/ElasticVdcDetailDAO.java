@@ -248,4 +248,8 @@ public class ElasticVdcDetailDAO extends ElasticVdcDAO {
 			return 0L;
 		}
 	}
+	
+	@Override
+	public void close() {
+	}
 }

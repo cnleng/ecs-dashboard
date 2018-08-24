@@ -20,9 +20,9 @@ import com.emc.ecs.metadata.utils.Constants;
  */
 @RestController
 @RequestMapping(value = Constants.MQTT + Constants.URL_VDC)
-public class VdcController {
+public class MqttVdcController {
 	
-	private static final Logger LOG = Logger.getLogger(VdcController.class);
+	private static final Logger LOG = Logger.getLogger(MqttVdcController.class);
 	private static final String VDC_DETAILS = "/vdcDetails";
 	private static final String BUCKET_OWNERS = "/bucketOwners";
 

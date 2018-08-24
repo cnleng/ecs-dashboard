@@ -84,7 +84,7 @@ public class VdcBO {
 			client.shutdown();
 		}
 		if (vdcDAO!=null) {
-			((ServiceNowDAO)vdcDAO).close();
+			vdcDAO.close();
 		}
 	}
 }

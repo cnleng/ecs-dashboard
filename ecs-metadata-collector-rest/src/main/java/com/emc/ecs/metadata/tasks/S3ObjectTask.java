@@ -61,24 +61,24 @@ public class S3ObjectTask implements Runnable {
 		try {
 			switch (this.taskType) {
 			case S3ObjectsData:
-				objectBO.collectObjectData(this.collectionTime, threadPoolExecutor, futures, objectCount);
+				objectBO.collectObjectData(this.collectionTime, this.threadPoolExecutor, this.futures, this.objectCount);
 				break;
 			case S3ObjectsDataByNamespace:
-				objectBO.collectObjectDataByNamespace(this.collectionTime, threadPoolExecutor, futures, objectCount);
+				objectBO.collectObjectDataByNamespace(this.collectionTime, this.threadPoolExecutor, this.futures, this.objectCount);
 				break;
 			case S3ObjectsDataByBucket:
-				objectBO.collectObjectDataByBucket(this.collectionTime, threadPoolExecutor, futures, objectCount);
+				objectBO.collectObjectDataByBucket(this.collectionTime, this.threadPoolExecutor, this.futures, this.objectCount);
 				break;				
 			case S3ObjectVersions:
-				objectBO.collectObjectVersionData(this.collectionTime, threadPoolExecutor, futures, objectCount);
+				objectBO.collectObjectVersionData(this.collectionTime, this.threadPoolExecutor, this.futures, this.objectCount);
 				break;
 			case S3ObjectsModified:
-				// query criteria should look like ( LastModified >= 'since date' )
+				// Query criteria should look like ( LastModified >= 'since date' )
 				Date sinceDate = new Date(
-						(collectionTime.getTime() - (TimeUnit.MILLISECONDS.convert(this.numberOfDays, TimeUnit.DAYS))));
+						(this.collectionTime.getTime() - (TimeUnit.MILLISECONDS.convert(this.numberOfDays, TimeUnit.DAYS))));
 				String yesterdayDateTime = DATA_DATE_FORMAT.format(sinceDate);
 				String queryCriteria = "( " + ECS_OBJECT_LAST_MODIFIED_MD_KEY + " >= '" + yesterdayDateTime + "' )";
-				objectBO.collectObjectData(this.collectionTime, threadPoolExecutor, futures, queryCriteria, objectCount);
+				objectBO.collectObjectData(this.collectionTime, this.threadPoolExecutor, this.futures, queryCriteria, this.objectCount);
 				break;
 			default:
 				break;
@@ -87,7 +87,7 @@ public class S3ObjectTask implements Runnable {
 			// wait for all threads to complete their work
 			while ( !futures.isEmpty() ) {
 			    try {
-					Future<?> future = futures.poll();
+					Future<?> future = this.futures.poll();
 					if(future != null){
 						future.get();
 					}
@@ -99,18 +99,18 @@ public class S3ObjectTask implements Runnable {
 			}
 			
 			Long objectCollectionFinish = System.currentTimeMillis();
-			Double deltaTime = Double.valueOf((objectCollectionFinish - collectionTime.getTime())) / 1000 ;
-			LOGGER.info("Collected " + objectCount.get() + " objects");
+			Double deltaTime = Double.valueOf((objectCollectionFinish - this.collectionTime.getTime())) / 1000 ;
+			LOGGER.info("Collected " + this.objectCount.get() + " objects");
 			LOGGER.info("Total collection time: " + deltaTime + " seconds");
 			
 			// take everything down once all threads have completed their work
-			threadPoolExecutor.shutdown();
+			this.threadPoolExecutor.shutdown();
 			
 			// wait for all threads to terminate
 			boolean termination = false; 
 			do {
 				try {
-					termination = threadPoolExecutor.awaitTermination(2, TimeUnit.MINUTES);
+					termination = this.threadPoolExecutor.awaitTermination(2, TimeUnit.MINUTES);
 				} catch (InterruptedException e) {
 					LOGGER.error(e.getLocalizedMessage());
 					termination = true;

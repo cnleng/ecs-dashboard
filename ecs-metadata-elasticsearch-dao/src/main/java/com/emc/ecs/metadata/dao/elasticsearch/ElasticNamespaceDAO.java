@@ -86,4 +86,8 @@ public abstract class ElasticNamespaceDAO implements NamespaceDAO {
 	@Override
 	public void insert(NamespaceQuota namespacequota, Date collectionTime) {
 	}
+	
+	@Override
+	public void close() {
+	}
 }

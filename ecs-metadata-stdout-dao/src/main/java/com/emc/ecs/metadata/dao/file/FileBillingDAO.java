@@ -119,5 +119,9 @@ public class FileBillingDAO implements BillingDAO {
 		// 
 		return 0L;
 	}
+	
+	@Override
+	public void close() {
+	}
 
 }

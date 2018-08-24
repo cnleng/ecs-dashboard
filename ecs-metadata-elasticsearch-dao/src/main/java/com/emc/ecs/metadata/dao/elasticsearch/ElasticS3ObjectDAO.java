@@ -806,6 +806,10 @@ public class ElasticS3ObjectDAO implements ObjectDAO {
 
 		return builder;
 	}
+	
+	@Override
+	public void close() {
+	}
 
 
 }

@@ -93,4 +93,8 @@ public class FileNamespaceDAO implements NamespaceDAO {
 		return null;
 	}
 
+	@Override
+	public void close() {
+	}
+
 }

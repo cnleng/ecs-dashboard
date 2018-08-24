@@ -87,5 +87,10 @@ public interface ObjectDAO {
 	 */
 	public Long purgeOldData( ObjectDataType type, Date collectionTime);
 	
+	/**
+	 * 
+	 */
+	public void close();
+	
 	
 }

@@ -353,7 +353,7 @@ public class BillingBO {
 			client.shutdown();
 		}
 		if (billingDAO!=null) {
-			((ServiceNowDAO)billingDAO).close();
+			billingDAO.close();
 		}
 	}
 

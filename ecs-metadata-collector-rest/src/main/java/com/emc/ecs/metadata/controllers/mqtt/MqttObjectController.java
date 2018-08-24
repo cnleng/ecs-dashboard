@@ -21,7 +21,7 @@ import com.emc.ecs.metadata.utils.Constants;
  */
 @RestController
 @RequestMapping(value = Constants.MQTT + Constants.URL_OBJECT)
-public class ObjectController {
+public class MqttObjectController {
 
 	private static final String OBJECT_DATAS = "/datas";
 	private static final String OBJECT_VERSIONS = "/versions";

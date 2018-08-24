@@ -48,4 +48,9 @@ public interface NamespaceDAO {
 	 * @return
 	 */
 	public Long purgeOldData(NamespaceDataType type, Date thresholdDate);
+
+	/**
+	 * 
+	 */
+	public void close();
 }

@@ -46,4 +46,9 @@ public interface VdcDAO {
 	 * @return
 	 */
 	public Long purgeOldData(VdcDataType type, Date thresholdDate);
+	
+	/**
+	 * 
+	 */
+	public void close();
 }

@@ -14,3 +14,6 @@ project(":ecs-metadata-elasticsearch-dao").projectDir = file("../ecs-metadata-el
 
 include 'ecs-metadata-service-now-dao'
 project(":ecs-metadata-service-now-dao").projectDir = file("../ecs-metadata-service-now-dao")
+
+include 'ecs-metadata-mqtt-dao'
+project(":ecs-metadata-mqtt-dao").projectDir = file("../ecs-metadata-mqtt-dao")

@@ -155,4 +155,10 @@ public class MqttBillingDAO extends MqttDAO implements BillingDAO  {
 		return mapper.writeValueAsString(jsonMap);
 	}
 
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

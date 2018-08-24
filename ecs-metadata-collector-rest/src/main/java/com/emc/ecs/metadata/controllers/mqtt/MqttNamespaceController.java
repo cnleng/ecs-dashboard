@@ -20,9 +20,9 @@ import com.emc.ecs.metadata.utils.Constants;
  */
 @RestController
 @RequestMapping(value = Constants.MQTT + Constants.URL_NAMESPACE)
-public class NamespaceController {
+public class MqttNamespaceController {
 	
-	private static final Logger LOG = Logger.getLogger(NamespaceController.class);
+	private static final Logger LOG = Logger.getLogger(MqttNamespaceController.class);
 	private static final String NAMESPACE_DETAILS = "/details";
 	private static final String NAMESPACE_QUOTAS = "/quotas";
 	
